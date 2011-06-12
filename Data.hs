@@ -14,8 +14,9 @@ data FDef = FDef Name [Name] Expr deriving (Eq)
 data Program = Program [FDef] [GDef] deriving (Eq)
 
 type Renaming = [(Name, Name)]
-type Subst = [(Name, Expr)]
+type Subst = [Binding]
 type NameSupply = [Name]
+type Binding = (Name, Expr)
 
 type Conf = Expr
 type Value = Expr
