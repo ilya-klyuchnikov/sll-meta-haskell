@@ -5,7 +5,7 @@ import DataUtil
 import DataIO
 import Driving
 import Data.List
---import Debug.Trace
+-- import Debug.Trace
 
 -- assumptions:
 --  1) m constructs a perfect process tree
@@ -41,10 +41,9 @@ intersectSubst :: Subst -> Subst -> Subst
 --intersectSubst s1 s2 | trace ("???" ++ show s1 ++ show s2 ++ "???") False = undefined 
 --intersectSubst s1 s2 = zipWith (\(k1, val1) (k2, val2) -> (k1, merge val1 val2)) s1 s2
 intersectSubst s1 s2 = zipWith (\(v1, e1) (v2, e2) -> (v1, merge e1 e2)) (s1 /// s) (s2 /// s) where
-    s = mgu (zip (map snd s1) (map snd s2))
+    s = mgu $ zipWith (\(_, v1) (_, v2) -> (v1, v2)) s1 s2
 
 merge :: Conf -> Conf -> Conf
---merge c1 c2 | trace (show c1 ++ show c2) False = undefined
 merge (Ctr n1 args1) (Ctr n2 args2) | n1 == n2 =
     Ctr n1 (zipWith merge args1 args2)
 merge (Var v1 rs1) (Var v2 rs2) | v1 == v2 =
@@ -52,20 +51,16 @@ merge (Var v1 rs1) (Var v2 rs2) | v1 == v2 =
 merge e1 e2 | e1 == e2 = 
     e1
 
--- it is limited for now
+-- this is a "positive mgu"
 mgu :: [(Conf, Conf)] -> Subst
 mgu [] = []
 mgu (eq : eqs) = 
     case eq of 
         (e1, e2) | e1 == e2 -> mgu eqs
-        (Ctr n1 args1, Ctr n2 args2) | n1 == n2 -> mgu ((zip args1 args2) ++ eqs)
-        (e1'@(Ctr _ _), Var v2' []) -> mgu' [(v2', e1')]
-        (Var v1' [], e2'@(Ctr _ _)) -> mgu' [(v1', e2')]
-        (e1'@(Atom _), Var v2' rs2) | e1' `notElem` rs2 -> mgu' [(v2', e1')]
-        (Var v1' rs1, e2'@(Atom _)) | e2' `notElem` rs1-> mgu' [(v1', e2')]
-        -- IS THIS CORRECT ??????
-        (Var v1 rs1, Var v2 rs2) -> mgu' [(v1, Var v2 rs2)]--mgu' [(v1, Var v1 $ nub $ rs1 ++ rs2)]
-        p -> error (">>>" ++ show p)
+        (Ctr n1 args1, Ctr n2 args2) -> mgu ((zip args1 args2) ++ eqs)
+        (Var v1 rs1, Var v2 rs2) -> mgu' [(max v1 v2, var (min v1 v2))]
+        (Var v1 _, e2) -> mgu' [(v1, e2)]
+        (e1, Var v2 _) -> mgu' [(v2, e1)]
     where
-        mgu' s = extends s $ mgu (map (\(e1, e2) -> (e1 // s, e2 // s)) eqs)
-        extends s1 s2 = [ (v, (Var v [] // s1) // s2) | v <- nub $ map fst $ s1 ++ s2 ]
+        mgu' s = (s /// sub) ++ sub 
+            where sub = mgu $ map (\(e1, e2) -> (e1 // s, e2 // s)) eqs
