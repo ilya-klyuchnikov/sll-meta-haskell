@@ -150,8 +150,3 @@ sampleNan6 = sampleNan
         progString
         "P(gStrEq(Cons('A', Nil()), Cons('B', Nil())), gStrEq(Cons('A', Nil()), Cons('C', Nil())))"
         "P(gStrEq(x, Cons('B', Nil())), gStrEq(x, Cons('C', Nil())))"
-
-readPars :: ReadS String
-readPars s = do
-    ("(", s1) <- lex s
-    return ("*", s1)
