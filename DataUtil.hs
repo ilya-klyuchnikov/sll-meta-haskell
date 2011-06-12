@@ -41,23 +41,19 @@ gDef :: Program -> Name -> Name -> GDef
 gDef p gname cname = head [g | g@(GDef _ (Pat c _) _ _) <- gDefs p gname, c == cname]
 
 (//) :: Expr -> Subst -> Expr
-(Var x rs) // sub = case (lookup x sub) of
-    Nothing -> Var x (map (clear . (//sub)) rs)
-    Just (Var x1 rs1) -> Var x1 rs'' where
-        rs' = map (rSub sub) rs
-        rs'' = union rs' rs1 
+(Var x1 rs1) // sub = case (lookup x1 sub) of
+    Nothing -> Var x1 rs1'
+    Just (Var x2 rs2) -> Var x2 (union rs1' rs2)
     Just e -> e
+    where 
+        rs1' = nub $ map (clear . (// sub)) rs1
+        clear (Var x _) = var x
+        clear e = e
 (Ctr name args) // sub = Ctr name (map (// sub) args)
 (FCall name args) // sub = FCall name (map (// sub) args)
 (GCall name args) // sub = GCall name (map (// sub) args)
 (Atom x) // sub = (Atom x)
 (TestEq (a1, a2) (e1, e2)) // sub = (TestEq (a1 // sub, a2 // sub) (e1 // sub, e2 // sub))
-
--- for restrictions --
-rSub :: Subst -> Expr -> Expr
-rSub sub e = clear (e // sub) where
-clear (Var x _) = Var x []
-clear e = e
 
 -- handling a != b contraction (in Scala: implicits)
 contra2sub :: Contraction Expr -> Subst
@@ -89,23 +85,9 @@ vnames' (Atom a) = []
 isRepeated :: Name -> Expr -> Bool
 isRepeated vn e = (length $ filter (== vn) (vnames' e)) > 1
 
+-- TODO
 renaming :: Expr -> Expr -> Maybe Renaming
-renaming e1 e2 = f $ partition isNothing $ renaming' (e1, e2) where
-    f (x:_, _) = Nothing
-    f (_, ps) = g gs1 gs2
-        where 
-            gs1 = groupBy (\(a, b) (c, d) -> a == c) $ sortBy h $ nub $ catMaybes ps
-            gs2 = groupBy (\(a, b) (c, d) -> b == d) $ sortBy h $ nub $ catMaybes ps
-            h (a, b) (c, d) = compare a c
-    g xs ys = if all ((== 1) . length) xs && all ((== 1) . length) ys 
-        then Just (concat xs) else Nothing
-
-renaming' :: (Expr, Expr) -> [Maybe (Name, Name)]
-renaming' ((Var x _), (Var y _)) = [Just (x, y)]
-renaming' ((Ctr n1 args1), (Ctr n2 args2)) | n1 == n2 = concat $ map renaming' $ zip args1 args2
-renaming' ((FCall n1 args1), (FCall n2 args2)) | n1 == n2 = concat $ map renaming' $ zip args1 args2
-renaming' ((GCall n1 args1), (GCall n2 args2)) | n1 == n2 = concat $ map renaming' $ zip args1 args2
-renaming' _  = [Nothing]
+renaming = undefined
 
 size :: Expr -> Integer
 size (Var _ _) = 1
