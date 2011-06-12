@@ -3,7 +3,6 @@ module Driving where
 import Data
 import DataUtil
 import Interpreter
---import Debug.Trace
 
 buildTree :: Machine Conf -> Conf -> Tree Conf
 buildTree m e = bt m e
@@ -19,17 +18,15 @@ bt m c = case m c of
 driveMachine :: Program -> Machine Conf
 driveMachine p = driveStep where
     driveStep :: Machine Conf
-    --driveStep e | trace ("??" ++ show e) False = undefined
     driveStep e@(Var _ _) = 
         Stop e
     driveStep (GCall gn args) | isVar (head args) = 
         Variants vars where
             vars = (map (scrutinize args) (gDefs p gn))
-            --vars' = trace (show vars) vars
     driveStep (GCall gn (arg:args)) | isCall arg || isTest arg = 
         case (driveStep arg) of
             Transient pat t -> Transient pat (GCall gn (t:args))
-            Variants cs -> Variants (map (\(c, t) -> (c, GCall gn (t:args))) cs) -- Control.Arrow.second
+            Variants cs -> Variants (map (\(c, t) -> (c, GCall gn (t:args))) cs)
     -- 1) equal vars -- 
     -- this step is not correct for supercompilation (due to generalization)
     driveStep (TestEq (Var a1 _, Var a2 _) (e1, _)) | a1 == a2 =
@@ -76,13 +73,12 @@ perfectDriveMachine  = addPropagation . driveMachine
 scrutinize ::  [Expr] -> GDef -> (Contraction Expr, Expr)
 scrutinize ((Var v _) : args) (GDef _ pat@(Pat cn cvs) vs body) = 
     (Contraction v (Ctr cn fresh), body // sub) where
-        fresh =  makeFreshVars v pat  --map (\x -> Var x []) (take (length cvs) ns)
+        fresh =  makeFreshVars v pat
         sub = zip (cvs ++ vs) (fresh ++ args)
 
 -- here is the biggest simplification
--- another trick to specify MAX_ARITY - to generate "human-readable names" when
 makeFreshVars :: Name -> Pat -> [Expr]
-makeFreshVars n (Pat _ vs) = [Var (show i ++ "." ++ n) [] | i <- [1 .. length vs]]
+makeFreshVars n (Pat _ vs) = [Var (show i ++ [delim] ++ n) [] | i <- [1 .. length vs]]
 
 addPropagation :: Machine Conf -> Machine Conf
 addPropagation m e = propagateContraction (m e)

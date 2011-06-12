@@ -1,11 +1,5 @@
-module DataUtil(
-    isCall,isVar, var,
-    fDef, gDef, gDefs,
-    (//), (///), contra2sub, renaming, vnames,nameSupply,freshVars,
-    nodeLabel,isRepeated,isTest,
-    pat2Ctr
-    ) where
-    
+module DataUtil where
+
 import Data
 import Maybe
 import Char
@@ -70,9 +64,9 @@ vnames = nub . vnames'
 vnames' :: Expr -> [Name]
 vnames' (Var v _) = [v]
 vnames' (Atom a) = []
-vnames' (Ctr _ args)   = concat $ map vnames' args
-vnames' (FCall _ args) = concat $ map vnames' args
-vnames' (GCall _ args) = concat $ map vnames' args
+vnames' (Ctr _ args)   = (concat . map vnames') args
+vnames' (FCall _ args) = (concat . map vnames') args
+vnames' (GCall _ args) = (concat . map vnames') args
 
 isRepeated :: Name -> Expr -> Bool
 isRepeated vn e = (length $ filter (== vn) (vnames' e)) > 1
@@ -87,3 +81,21 @@ nodeLabel (Leaf l) = l
 
 pat2Ctr :: Pat -> Expr
 pat2Ctr (Pat cn vs) = Ctr cn (map (\x -> Var x []) vs)
+
+delim = '.'
+
+prettyName :: Name -> Name
+prettyName n | delim `elem` n = pn ++ [delim] ++ (show i) where
+    parts = filter (/= [delim]) $ groupBy (\c1 c2 -> c1 /= delim && c2 /= delim) n
+    parts' = init parts
+    pn = last parts
+    i = sum $ zipWith (\i n -> (read i :: Int) * n) parts' [1 ..]
+prettyName n = n
+
+prettyVar :: Expr -> Expr
+prettyVar (Var v rs) = Var (prettyName v) (map prettyVar rs)
+prettyVar (Ctr n args)   = Ctr n (map prettyVar args)
+prettyVar (FCall n args) = FCall n (map prettyVar args)
+prettyVar (GCall n args) = GCall n (map prettyVar args)
+prettyVar (TestEq (a1, a2) (e1, e2)) = TestEq (prettyVar a1, prettyVar a2) (prettyVar e1, prettyVar e2)
+prettyVar e = e

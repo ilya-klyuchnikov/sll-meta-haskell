@@ -21,13 +21,13 @@ nan' sub (Node _ (ETransient (Just (CtrMatch (Pat cname _))) t1)) (Node conf (EV
     Just (contr, t2) = find (\(Contraction _ (Ctr cn _), _) -> cn == cname) xs
     sub' = nan' (sub /// contra2sub contr) t1 t2
 nan' sub (Node _ (ETransient (Just (TestRes res)) t1)) (Node conf (EVariants [c1, c2])) = sub' where
-    (contr, t2) = case res of 
-        True -> c1
+    (contr, t2) = case res of
+        True  -> c1
         False -> c2
     sub' = nan' (sub /// contra2sub contr) t1 t2
-nan' sub (Leaf e1) (Leaf (Var n _)) = 
+nan' sub (Leaf e1) (Leaf (Var n _)) =
     sub /// [(n, e1)]
-nan' sub _ _ = 
+nan' sub _ _ =
     sub
 
 intersectSubst :: Subst -> Subst -> Subst
@@ -37,8 +37,8 @@ intersectSubst s1 s2 = intersection where
     vals1 = map snd s1
     vals2 = map snd s2
     sub = mgu $ zip vals1 vals2
-    vals1' = map (// sub) vals1 
-    vals2' = map (// sub) vals2 
+    vals1' = map (// sub) vals1
+    vals2' = map (// sub) vals2
 
 mergeRestrictions :: Conf -> Conf -> Conf
 mergeRestrictions (Ctr n1 args1) (Ctr n2 args2) | n1 == n2 =

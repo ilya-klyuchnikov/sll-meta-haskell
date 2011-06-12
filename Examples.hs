@@ -58,10 +58,16 @@ progTree = read
     \ gListEq2(Cons(y, ys)) = 'F';"
 
 sampleURA prog resultText inputConfText =
-    putStrLn $ show $ ura (perfectDriveMachine prog) (read resultText) (read inputConfText)
+    putStrLn $ show $ map prettySub result 
+    where 
+        result = ura (perfectDriveMachine prog) (read resultText) (read inputConfText)
 
 sampleNan prog center conf = 
-    putStrLn $ show $ nan (perfectDriveMachine prog) (read center) (read conf)
+    putStrLn $ show $ prettySub result 
+    where 
+        result = nan (perfectDriveMachine prog) (read center) (read conf)
+
+prettySub = map (\(x, y) -> (x, prettyVar y))
 
 -- which string IS a substring of "AB"?
 sampleURA1 = sampleURA 
@@ -103,7 +109,7 @@ sampleURA6 = sampleURA
 sampleURA7 = sampleURA
         progTree
         "'T'"
-        "gListEq(gFlatten(t1), gFlatten(t2))"
+        "gListEq(gFlatten(tl), gFlatten(tr))"
 
 -- see example in
 -- "Faster Answers and Improved Termination in Inverse Computation of Non-Flat Languages"
