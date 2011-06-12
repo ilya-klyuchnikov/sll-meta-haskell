@@ -1,5 +1,5 @@
 module DataUtil(
-    isValue,isCall,isVar,size,
+    isValue,isCall,isVar,size,var,
     fDef, gDef, gDefs,
     (//), (///), contra2sub, renaming, vnames,nameSupply,freshVars,
     nodeLabel,isRepeated,unused,isTest,
@@ -10,6 +10,9 @@ import Data
 import Maybe
 import Char
 import List
+
+var :: Name -> Expr
+var n = Var n []
 
 isValue :: Expr -> Bool
 isValue (Ctr _ args) = and $ map isValue args 
@@ -38,14 +41,12 @@ gDef :: Program -> Name -> Name -> GDef
 gDef p gname cname = head [g | g@(GDef _ (Pat c _) _ _) <- gDefs p gname, c == cname]
 
 (//) :: Expr -> Subst -> Expr
-
-(Var x rs) // sub = maybe v' sub' (lookup x sub) where
-    sub' (Var x1 rs1) = Var x1 rs'' where
-        -- apply sub to restrictions
+(Var x rs) // sub = case (lookup x sub) of
+    Nothing -> Var x (map (clear . (//sub)) rs)
+    Just (Var x1 rs1) -> Var x1 rs'' where
         rs' = map (rSub sub) rs
-        rs'' = union rs' rs1
-    sub' e = e
-    v' = Var x (map (clear . (//sub)) rs)
+        rs'' = union rs' rs1 
+    Just e -> e
 (Ctr name args) // sub = Ctr name (map (// sub) args)
 (FCall name args) // sub = FCall name (map (// sub) args)
 (GCall name args) // sub = GCall name (map (// sub) args)
