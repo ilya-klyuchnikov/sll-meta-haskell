@@ -14,12 +14,9 @@ intEvalTree (Node _ (EDecompose comp ts)) = comp (map intEvalTree ts)
 
 buildEvalTree :: Machine Expr -> Conf -> Tree Expr
 buildEvalTree m c = case m c of
-    Stop e -> 
-        Leaf e
-    Transient test e -> 
-        Node c (ETransient test (buildEvalTree m e))
-    Decompose comp ds -> 
-        Node c (EDecompose comp (map (buildEvalTree m) ds))
+    Stop e -> Leaf e
+    Transient test e -> Node c (ETransient test (buildEvalTree m e))
+    Decompose comp ds -> Node c (EDecompose comp (map (buildEvalTree m) ds))
 
 evalMachine :: Program -> Machine Expr
 evalMachine p = evalStep where
