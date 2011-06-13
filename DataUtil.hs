@@ -67,6 +67,7 @@ vnames' (Atom a) = []
 vnames' (Ctr _ args)   = (concat . map vnames') args
 vnames' (FCall _ args) = (concat . map vnames') args
 vnames' (GCall _ args) = (concat . map vnames') args
+vnames' (TestEq (a1, a2) (e1, e2)) = (concat . map vnames') [a1, a2, e1, e2]
 
 isRepeated :: Name -> Expr -> Bool
 isRepeated vn e = (length $ filter (== vn) (vnames' e)) > 1
