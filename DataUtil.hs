@@ -96,3 +96,9 @@ prettyVar (FCall n args) = FCall n (map prettyVar args)
 prettyVar (GCall n args) = GCall n (map prettyVar args)
 prettyVar (TestEq (a1, a2) (e1, e2)) = TestEq (prettyVar a1, prettyVar a2) (prettyVar e1, prettyVar e2)
 prettyVar e = e
+
+reducible :: Expr -> Bool
+reducible (FCall _ _)  = True
+reducible (GCall _ _)  = True
+reducible (TestEq _ _) = True
+reducible _            = False
