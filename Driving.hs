@@ -14,8 +14,6 @@ buildConfTree m c = case m c of
 confMachine :: Program -> Machine Conf
 confMachine p = step where
     step :: Machine Conf
-    step e@(Var _ _) = 
-        Stop e
     step (GCall gn args) | isVar (head args) = 
         Variants (map (scrutinize args) (gDefs p gn))
     step (GCall gn (arg:args)) | reducible arg , Variants cs <- step arg = 
@@ -26,8 +24,8 @@ confMachine p = step where
         Variants (map (\(c, e2') -> (c, (TestEq (e1, e2') bs))) cs)
     step (TestEq cond (e1, e2)) | Right (s1, s2) <- test cond = 
         Variants [(s1, e1 // s1), (s2, e2 // s2)]
-    step e = 
-        exprMachine p e
+    step e@(Var _ _) = Stop e
+    step e = exprMachine p e
         
 perfectDriveMachine :: Program -> Machine Conf
 perfectDriveMachine  = (propagateContraction .) . confMachine
