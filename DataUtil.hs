@@ -102,3 +102,23 @@ reducible (FCall _ _)  = True
 reducible (GCall _ _)  = True
 reducible (TestEq _ _) = True
 reducible _            = False
+
+test :: (Conf, Conf) -> Either Bool (Subst Conf, Subst Conf)
+test (Var a1 rs1, Var a2 rs2)
+    | a1 == a2 = Left True
+    | (Var a2 []) `elem` rs1 = Left False
+    | otherwise = Right (s1, s2) where
+        s1 = [(a1, Var a2 rs2)]
+        s2 = [(a1, Var a1 [var a2]), (a2, Var a2 [var a1])]
+test (Var v rs, a@(Atom _))
+    | a `elem` rs = Left False
+    | otherwise   = Right (s1, s2) where
+        s1 = [(v, a)]
+        s2 = [(v, Var v [a])]
+test (a@(Atom _), Var v rs)
+    | a `elem` rs = Left False
+    | otherwise   = Right (s1, s2) where
+        s1 = [(v, a)]
+        s2 = [(v, Var v [a])]
+test (a1@(Atom _), a2@(Atom _)) =
+    Left (a1 == a2)

@@ -3,38 +3,39 @@ import Data
 import DataUtil
 
 eval :: Program -> Expr -> Expr
-eval p = intEvalTree . buildEvalTree (evalMachine p)
+eval p = intExprTree . buildExprTree (exprMachine p)
 
-intEvalTree :: Tree Expr -> Expr
-intEvalTree (Leaf e) = e
-intEvalTree (Node _ (ETransient _ t)) = intEvalTree t
-intEvalTree (Node _ (EDecompose comp ts)) = comp (map intEvalTree ts)
+intExprTree :: Tree Expr -> Expr
+intExprTree (Leaf e) = e
+intExprTree (Node _ (ETransient _ t)) = intExprTree t
+intExprTree (Node _ (EDecompose comp ts)) = comp (map intExprTree ts)
 
-buildEvalTree :: Machine Expr -> Expr -> Tree Expr
-buildEvalTree m c = case m c of
+buildExprTree :: Machine Expr -> Expr -> Tree Expr
+buildExprTree m c = case m c of
     Stop e -> Leaf e
-    Transient test e -> Node c (ETransient test (buildEvalTree m e))
-    Decompose comp ds -> Node c (EDecompose comp (map (buildEvalTree m) ds))
+    Transient test e -> Node c (ETransient test (buildExprTree m e))
+    Decompose comp ds -> Node c (EDecompose comp (map (buildExprTree m) ds))
 
-evalMachine :: Program -> Machine Expr
-evalMachine p = evalStep where
-    evalStep :: Machine Expr
-    evalStep (Atom n) =
+exprMachine :: Program -> Machine Expr
+exprMachine p = step where
+    step :: Machine Expr
+    step (Atom n) =
         Stop (Atom n)
-    evalStep (Ctr name []) =
+    step (Ctr name []) =
         Stop (Ctr name [])
-    evalStep (Ctr name args) = 
+    step (Ctr name args) = 
         Decompose (Ctr name) args
-    evalStep (FCall name args) | (FDef _ vs body) <- fDef p name= 
+    step (FCall name args) | (FDef _ vs body) <- fDef p name= 
         Transient Nothing (body // zip vs args)
-    evalStep (GCall g ((Ctr c cargs) : args)) | (GDef _ pat@(Pat _ cvs) vs body) <- gDef p g c =
+    step (GCall g ((Ctr c cargs) : args)) | (GDef _ pat@(Pat _ cvs) vs body) <- gDef p g c =
         Transient (Just (CtrMatch pat)) (body // zip (cvs ++ vs) (cargs ++ args))
-    evalStep (GCall gname (arg:args)) | Transient cond arg' <- evalStep arg = 
+    step (GCall gname (arg:args)) | Transient cond arg' <- step arg = 
         Transient cond (GCall gname (arg':args))
-    evalStep (TestEq (e1, e2) branches) | reducible e1, Transient cond e1' <- evalStep e1 =
+    step (TestEq (e1, e2) branches) | reducible e1, Transient cond e1' <- step e1 =
         Transient cond (TestEq (e1', e2) branches)
-    evalStep (TestEq (e1, e2) branches) | reducible e2, Transient cond e2' <- evalStep e2 =
+    step (TestEq (e1, e2) branches) | reducible e2, Transient cond e2' <- step e2 =
         Transient cond (TestEq (e1, e2') branches)
-    evalStep (TestEq (a1, a2) (e1, e2)) 
-        | a1 == a2  = Transient (Just (TestRes True)) e1 
-        | otherwise = Transient (Just (TestRes False)) e2
+    step (TestEq cond (e1, e2)) | Left True <- test cond =
+        Transient (Just (TestRes True)) e1
+    step (TestEq cond (e1, e2)) | Left False <- test cond =
+        Transient (Just (TestRes False)) e2

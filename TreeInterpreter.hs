@@ -18,8 +18,8 @@ intTree (Node _ (EFold t ren)) env =
     intTree t $ map (\(k, v) -> (renKey k, v)) env where
         renKey k = maybe k fst (find ((k ==) . snd)  ren)
 
-try :: Env -> (Contraction Conf, Tree Conf) -> (Maybe Expr)
-try env (Contraction v ctr@(Ctr pn _), t) = 
+try :: Env -> (Subst Conf, Tree Conf) -> (Maybe Expr)
+try env ([(v, ctr@(Ctr pn _))], t) = 
     if cn == pn then (Just $ intTree t extEnv) else Nothing where 
         c@(Ctr cn cargs) = (Var v []) // env
         extEnv = zip (vnames ctr) cargs ++ env

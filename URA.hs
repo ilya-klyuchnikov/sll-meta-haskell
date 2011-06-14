@@ -5,7 +5,7 @@ import DataUtil
 import Driving
 
 ura :: Machine Conf -> Expr -> Conf -> [Subst Conf]
-ura machine answer conf = traverse [(sub0, buildTree machine conf)] [] where
+ura machine answer conf = traverse [(sub0, buildConfTree machine conf)] [] where
     sub0 = map (\n -> (n, var n)) (vnames conf)
     traverse :: [(Subst Conf, Tree Conf)] -> [(Subst Conf, Tree Conf)] -> [Subst Conf]
     traverse [] [] = []

@@ -118,60 +118,60 @@ demo09 =
 
 --  driving (variants)
 demo10 =
-    (driveMachine prog1) (read "gOdd(gAdd(x, gMult(x, S(x))))")
+    (confMachine prog1) (read "gOdd(gAdd(x, gMult(x, S(x))))")
 
 demo10a =
     (perfectDriveMachine prog1) (read "gOdd(gAdd(x, gMult(x, S(x))))")
 
 -- driving (transient step) 
 demo11 = 
-    (driveMachine prog1) (read "gOdd(S(gAdd(v1, gMult(x, S(x)))))")
+    (confMachine prog1) (read "gOdd(S(gAdd(v1, gMult(x, S(x)))))")
 
 demo11a = 
     (perfectDriveMachine prog1) (read "gOdd(S(gAdd(v1, gMult(x, S(x)))))")
     
 -- building infinite tree
 demo12 =
-    putStrLn $ printTree $ buildTree (driveMachine prog1) (read "gEven(fSqr(x))")
+    putStrLn $ printTree $ buildConfTree (confMachine prog1) (read "gEven(fSqr(x))")
 
 -- using intTree (infinite tree) to run task 
 demo13 =
-    intTree (buildTree (driveMachine prog1) (read "gEven(fSqr(x))")) [("x", read "S(S(Z()))")]
+    intTree (buildConfTree (confMachine prog1) (read "gEven(fSqr(x))")) [("x", read "S(S(Z()))")]
     
 -- using intTree (folded finite graph) to run task
 demo13a = 
-    intTree (foldTree $ buildTree (driveMachine prog1) (read "gEven(fSqr(x))")) [("x", read "S(S(Z()))")]
+    intTree (foldTree $ buildConfTree (confMachine prog1) (read "gEven(fSqr(x))")) [("x", read "S(S(Z()))")]
 
 -- using intTree (infinite tree) to run task
 demo14 =
-    intTree (buildTree (driveMachine prog1) (read "gEven(fSqr(x))")) [("x", read "S(S(S(Z())))")]
+    intTree (buildConfTree (confMachine prog1) (read "gEven(fSqr(x))")) [("x", read "S(S(S(Z())))")]
 
 -- successful folding
 demo15 =
-    putStrLn $ printTree $ foldTree $ buildTree (driveMachine prog1) (read "gEven(fSqr(x))")
+    putStrLn $ printTree $ foldTree $ buildConfTree (confMachine prog1) (read "gEven(fSqr(x))")
     
 -- successful folding (tex)
 demo15a =
-    putStrLn $ pprintLTree $ foldTree $ buildTree (driveMachine prog1) (read "gEven(fSqr(x))")
+    putStrLn $ pprintLTree $ foldTree $ buildConfTree (confMachine prog1) (read "gEven(fSqr(x))")
 
 -- an example of "not foldable" tree
 demo16 =
-    putStrLn $ printTree $ foldTree $ buildTree (driveMachine prog1) (read "gAdd1(x, y)")
+    putStrLn $ printTree $ foldTree $ buildConfTree (confMachine prog1) (read "gAdd1(x, y)")
 
 demo20 =
-    putStrLn $ printTree $ buildTree (perfectDriveMachine progMatch) 
+    putStrLn $ printTree $ buildConfTree (perfectDriveMachine progMatch) 
         (read "fMatch(Cons(a, Cons(b, Nil())), Cons(b, Cons(d, Nil())))")
 
 demo21 =
-    putStrLn $ printTree $ buildTree (perfectDriveMachine progMatch) 
+    putStrLn $ printTree $ buildConfTree (perfectDriveMachine progMatch) 
         (read "fMatch(Cons(a, Cons(b, Nil())), Cons('A', Cons('B', Nil())))")
 
 demo22 =
-    putStrLn $ printTree $ buildTree (perfectDriveMachine progMatch) 
+    putStrLn $ printTree $ buildConfTree (perfectDriveMachine progMatch) 
         (read "fMatch(Cons(x, Cons('A', Nil())), Cons('A', Cons('B', Nil())))")
 
 demo23 =
-    putStrLn $ printTree $ buildTree (perfectDriveMachine progMatch) 
+    putStrLn $ printTree $ buildConfTree (perfectDriveMachine progMatch) 
         (read "fMatch(x, Cons('A', Cons('B', Nil())))")
 
 

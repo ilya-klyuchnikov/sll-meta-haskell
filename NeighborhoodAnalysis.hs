@@ -10,7 +10,7 @@ import Data.List
 nan :: Machine Conf -> Expr -> Conf -> Subst Conf
 nan m e1 e2 = sub where
     sub0 = map (\n -> (n, Var n [])) (vnames e2)
-    sub = nan' sub0 (buildEvalTree m e1) (buildTree m e2)
+    sub = nan' sub0 (buildExprTree m e1) (buildConfTree m e2)
 
 nan' :: Subst Conf -> Tree Expr -> Tree Conf -> Subst Conf
 nan' sub (Node _ (EDecompose _ ts1)) (Node _ (EDecompose _ ts2)) = sub' where
