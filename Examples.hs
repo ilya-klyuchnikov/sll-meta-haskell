@@ -72,8 +72,8 @@ prettySub = map (\(x, y) -> (x, prettyVar y))
 -- which string IS a substring of "AB"?
 sampleURA1 = sampleURA 
         progString 
-        "'T'" 
         "fMatch(x, Cons('A', Cons('B', Nil())))"
+        "'T'"
 
 -- which string IS NOT a substring of "AB"?
 sampleURA2 = sampleURA 
