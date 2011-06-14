@@ -159,16 +159,21 @@ demo16 =
     putStrLn $ printTree $ foldTree $ buildTree (driveMachine prog1) (read "gAdd1(x, y)")
 
 demo20 =
-    putStrLn $ printTree $ buildTree (addPropagation $ driveMachine progMatch) 
+    putStrLn $ printTree $ buildTree (perfectDriveMachine progMatch) 
         (read "fMatch(Cons(a, Cons(b, Nil())), Cons(b, Cons(d, Nil())))")
 
 demo21 =
-    putStrLn $ printTree $ buildTree (addPropagation $ driveMachine progMatch) 
+    putStrLn $ printTree $ buildTree (perfectDriveMachine progMatch) 
         (read "fMatch(Cons(a, Cons(b, Nil())), Cons('A', Cons('B', Nil())))")
 
 demo22 =
-    putStrLn $ printTree $ buildTree (addPropagation $ driveMachine progMatch) 
-        (read "fMatch(Cons(a, Cons(b, Nil())), Cons(c, Cons(a, Nil())))")
+    putStrLn $ printTree $ buildTree (perfectDriveMachine progMatch) 
+        (read "fMatch(Cons(x, Cons('A', Nil())), Cons('A', Cons('B', Nil())))")
+
+demo23 =
+    putStrLn $ printTree $ buildTree (perfectDriveMachine progMatch) 
+        (read "fMatch(x, Cons('A', Cons('B', Nil())))")
+
 
 main = do
     putStrLn "\ndemo06"

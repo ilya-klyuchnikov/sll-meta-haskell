@@ -6,10 +6,10 @@ import Interpreter
 
 buildTree :: Machine Conf -> Conf -> Tree Conf
 buildTree m c = case m c of
-    Transient test e -> Node c $ ETransient test (buildTree m e)
     Stop e -> Leaf e
-    Decompose comp ds -> Node c $ EDecompose comp $ map (buildTree m) ds
-    Variants cs -> Node c $ EVariants [(c, buildTree m e) | (c, e) <- cs]
+    Transient test e -> Node c (ETransient test (buildTree m e))
+    Decompose comp ds -> Node c (EDecompose comp (map (buildTree m) ds))
+    Variants cs -> Node c (EVariants [(c, buildTree m e) | (c, e) <- cs])
 
 driveMachine :: Program -> Machine Conf
 driveMachine p = driveStep where
@@ -32,20 +32,22 @@ driveMachine p = driveStep where
     driveStep (TestEq (Var a1 rs1, Var a2 rs2) (e1, e2)) | (Var a2 []) `elem` rs1 =
         Transient (Just (TestRes False)) e2
     -- 3) any vars
-    driveStep (TestEq (Var a1 rs1, Var a2 rs2) (e1, e2)) = 
+    driveStep (TestEq (v1@(Var a1 rs1), v2@(Var a2 rs2)) (e1, e2)) = 
         Variants [tBranch, fBranch] where
             tBranch = (Contraction a1 v2,  e1 // [(a1, v2)])
             fBranch = (Contraction a1 v1', e2 // [(a1, v1'), (a2, v2')])
-            v1 = Var a1 []
-            v2 = Var a2 []
-            v1' = Var a1 [v2]
-            v2' = Var a2 [v1]
+            v1' = Var a1 [var a2]
+            v2' = Var a2 [var a1]
     -- 4) var / atom
+    driveStep (TestEq (Var v rs, a@(Atom _)) (e1, e2)) | a `elem` rs =
+        Transient (Just (TestRes False)) e2
     driveStep (TestEq (Var v _, a@(Atom _)) (e1, e2)) = Variants [tBranch, fBranch] where
         tBranch = (Contraction v a,  e1 // [(v, a)])
         fBranch = (Contraction v v', e2 // [(v, v')])
         v' = Var v [a]
     -- 5) atom / var
+    driveStep (TestEq (a@(Atom _), Var v rs) (e1, e2)) | a `elem` rs = 
+        Transient (Just (TestRes False)) e2
     driveStep (TestEq (a@(Atom _), Var v _) (e1, e2)) = Variants [tBranch, fBranch] where
         tBranch = (Contraction v a,  e1 // [(v, a)])
         fBranch = (Contraction v v', e2 // [(v, v')])
