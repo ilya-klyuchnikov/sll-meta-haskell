@@ -15,14 +15,14 @@ nan' contr (Node _ (EDecompose _ cts)) (Node _ (EDecompose _ ets)) =
     foldl1 intersectContr (zipWith (nan' contr) cts ets)
 nan' contr (Node _ (ETransient _ ct)) (Node _ (ETransient _ et)) = 
     nan' contr ct et
-nan' contr (Node conf (EVariants vs)) (Node _ (ETransient (Just (CtrMatch (Pat cname _))) et)) = 
+nan' contr (Node _ (EVariants vs)) (Node _ (ETransient (Just (CtrMatch (Pat cname _))) et)) = 
     nan' (contr /// contr') ct et where
         [(contr', ct)] = [(c, t) | (c@[(_, Ctr n _)], t) <- vs, n == cname]
-nan' contr (Node conf (EVariants [(contr', ct), _])) (Node _ (ETransient (Just (TestRes True)) et)) = 
+nan' contr (Node _ (EVariants [(contr', ct), _])) (Node _ (ETransient (Just (TestRes True)) et)) = 
     nan' (contr /// contr') ct et
-nan' contr (Node conf (EVariants [_, (contr', ct)])) (Node _ (ETransient (Just (TestRes False)) et)) = 
+nan' contr (Node _ (EVariants [_, (contr', ct)])) (Node _ (ETransient (Just (TestRes False)) et)) = 
     nan' (contr /// contr') ct et
-nan' contr  (Leaf (Var n _)) (Leaf e1) =
-    contr /// [(n, e1)]
+nan' contr (Leaf (Var n _)) (Leaf e) =
+    contr /// [(n, e)]
 nan' contr _ _ =
     contr
