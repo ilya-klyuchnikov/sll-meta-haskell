@@ -2,14 +2,6 @@ module Interpreter where
 import Data
 import DataUtil
 
-eval :: Program -> Expr -> Expr
-eval p = intExprTree . buildExprTree (exprMachine p)
-
-intExprTree :: Tree Expr -> Expr
-intExprTree (Leaf e) = e
-intExprTree (Node _ (ETransient _ t)) = intExprTree t
-intExprTree (Node _ (EDecompose comp ts)) = comp (map intExprTree ts)
-
 buildExprTree :: Machine Expr -> Expr -> Tree Expr
 buildExprTree m c = case m c of
     Stop e -> Leaf e
@@ -39,3 +31,11 @@ exprMachine p = step where
         Transient (Just (TestRes True)) e1
     step (TestEq cond (e1, e2)) | Left False <- test cond =
         Transient (Just (TestRes False)) e2
+
+eval :: Program -> Expr -> Expr
+eval p = intExprTree . buildExprTree (exprMachine p)
+
+intExprTree :: Tree Expr -> Expr
+intExprTree (Leaf e) = e
+intExprTree (Node _ (ETransient _ t)) = intExprTree t
+intExprTree (Node _ (EDecompose comp ts)) = comp (map intExprTree ts)

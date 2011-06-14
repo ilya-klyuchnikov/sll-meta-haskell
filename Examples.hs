@@ -65,7 +65,7 @@ sampleURA prog resultText inputConfText =
 sampleNan prog center conf = 
     putStrLn $ show $ prettySub result 
     where 
-        result = nan (perfectDriveMachine prog) (read center) (read conf)
+        result = nan (perfectDriveMachine prog) (read conf) (read center) 
 
 prettySub = map (\(x, y) -> (x, prettyVar y))
 

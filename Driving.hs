@@ -38,9 +38,6 @@ scrutinize ((Var v _) : args) (GDef _ pat@(Pat cn cvs) vs body) =
         fresh =  makeFreshVars v pat
         sub = zip (cvs ++ vs) (fresh ++ args)
 
-makeFreshVars :: Name -> Pat -> [Expr]
-makeFreshVars n (Pat _ vs) = [Var (show i ++ [delim] ++ n) [] | i <- [1 .. length vs]]
-
 propagateContraction :: Step Conf -> Step Conf
 propagateContraction (Variants vs) = Variants [(c, e // c) | (c, e) <- vs]
 propagateContraction step = step

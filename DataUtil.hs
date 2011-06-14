@@ -122,3 +122,37 @@ test (a@(Atom _), Var v rs)
         s2 = [(v, Var v [a])]
 test (a1@(Atom _), a2@(Atom _)) =
     Left (a1 == a2)
+
+intersectContr :: Subst Conf -> Subst Conf -> Subst Conf
+intersectContr s1 s2 = intersection where
+    intersection = zip keys $ zipWith mergeRestrictions vals1' vals2'
+    keys  = map fst s1
+    vals1 = map snd s1
+    vals2 = map snd s2
+    sub = mgu $ zip vals1 vals2
+    vals1' = map (// sub) vals1
+    vals2' = map (// sub) vals2
+
+mergeRestrictions :: Conf -> Conf -> Conf
+mergeRestrictions (Ctr n1 args1) (Ctr n2 args2) | n1 == n2 =
+    Ctr n1 (zipWith mergeRestrictions args1 args2)
+mergeRestrictions (Var v1 rs1) (Var v2 rs2) | v1 == v2 =
+    Var v1 (union rs1 rs2)
+mergeRestrictions e1 e2 | e1 == e2 = 
+    e1
+
+mgu :: [(Conf, Conf)] -> Subst Conf
+mgu [] = []
+mgu (eq : eqs) = 
+    case eq of 
+        (e1, e2) | e1 == e2 -> mgu eqs
+        (Ctr n1 args1, Ctr n2 args2) -> mgu ((zip args1 args2) ++ eqs)
+        (Var v1 rs1, Var v2 rs2) -> mgu' [(max v1 v2, var (min v1 v2))]
+        (Var v1 _, e2) -> mgu' [(v1, e2)]
+        (e1, Var v2 _) -> mgu' [(v2, e1)]
+    where
+        mgu' s = (s /// sub) ++ sub 
+            where sub = mgu $ map (\(e1, e2) -> (e1 // s, e2 // s)) eqs
+            
+makeFreshVars :: Name -> Pat -> [Expr]
+makeFreshVars n (Pat _ vs) = [Var (show i ++ [delim] ++ n) [] | i <- [1 .. length vs]]
