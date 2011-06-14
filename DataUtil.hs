@@ -156,3 +156,5 @@ mgu (eq : eqs) =
             
 makeFreshVars :: Name -> Pat -> [Expr]
 makeFreshVars n (Pat _ vs) = [Var (show i ++ [delim] ++ n) [] | i <- [1 .. length vs]]
+
+idContr conf = map (\n -> (n, var n)) (vnames conf)

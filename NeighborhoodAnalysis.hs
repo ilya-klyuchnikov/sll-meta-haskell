@@ -8,8 +8,7 @@ import Interpreter
 import Data.List
 
 nan :: Machine Conf -> Conf -> Expr -> Subst Conf
-nan m conf expr = nan' contr0 (buildConfTree m conf) (buildExprTree m expr) where
-    contr0 = map (\n -> (n, var n)) (vnames conf)
+nan m conf expr = nan' (idContr conf) (buildConfTree m conf) (buildExprTree m expr)
 
 nan' :: Subst Conf -> Tree Conf -> Tree Expr -> Subst Conf
 nan' contr (Node _ (EDecompose _ cts)) (Node _ (EDecompose _ ets)) = 

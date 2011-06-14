@@ -57,10 +57,10 @@ progTree = read
     \ gListEq2(Nil()) = 'T'; \
     \ gListEq2(Cons(y, ys)) = 'F';"
 
-sampleURA prog resultText inputConfText =
+sampleURA prog inputConfText resultText =
     putStrLn $ show $ map prettySub result 
     where 
-        result = ura (perfectDriveMachine prog) (read resultText) (read inputConfText)
+        result = ura (perfectDriveMachine prog) (read inputConfText) (read resultText)
 
 sampleNan prog center conf = 
     putStrLn $ show $ prettySub result 
@@ -78,68 +78,68 @@ sampleURA1 = sampleURA
 -- which string IS NOT a substring of "AB"?
 sampleURA2 = sampleURA 
         progString 
-        "'F'" 
         "fMatch(x, Cons('A', Cons('B', Nil())))"
+        "'F'" 
                 
 -- which tree can be flatten to "ABCDEFG"?
 sampleURA3 = sampleURA 
         progTree 
-        "'T'" 
         "gListEq(Cons('a', Cons('b', Cons('c', Cons('d', Cons('e', Cons('f', Cons('g', Nil()))))))), gFlatten(t))"
+        "'T'" 
 
 -- which tree can be flatten to "ABC"?
 sampleURA3' = sampleURA 
         progTree 
-        "'T'" 
         "gListEq(Cons('a', Cons('b', Cons('c', Nil()))), gFlatten(t))"
+        "'T'" 
 
 -- all trees of size 1
 sampleURA4 = sampleURA
         progTree
-        "'T'"
         "gEq(S(Z()), gSize(t))"
+        "'T'"
                 
 -- all trees of size 2
 sampleURA5 = sampleURA 
         progTree
-        "'T'"
         "gEq(S(S(Z())), gSize(t))"
+        "'T'"
                 
 -- all trees of size 5
 sampleURA6 = sampleURA
         progTree
-        "'T'"
         "gEq(S(S(S(S(S(Z()))))), gSize(t))"
-                
+        "'T'"
+   
 -- all trees whose flattened representations are the same
 sampleURA7 = sampleURA
         progTree
-        "'T'"
         "gListEq(gFlatten(tl), gFlatten(tr))"
+        "'T'"
 
 -- see example in
 -- "Faster Answers and Improved Termination in Inverse Computation of Non-Flat Languages"
 sampleURA8 = sampleURA
         progString
-        "'T'"
         "gStrEq(Cons('B', Nil()), ga2b(s))"
+        "'T'"
 
 -- see example in
 -- "Faster Answers and Improved Termination in Inverse Computation of Non-Flat Languages"        
 sampleURA9 = sampleURA
         progString
-        "'T'"
         "gStrEq(Cons('B', Cons('B', Cons('B', Nil()))), ga2b(Cons(c, Cons(c, Cons(c, Nil())))))"
+        "'T'"
         
 sampleURA10 = sampleURA
         progString
-        "'F'"
         "fMatch(x, y)"
+        "'F'"
 
 sampleURA11 = sampleURA
         progString
-        "'T'"
         "fMatch(x, y)"
+        "'T'"
 
 sampleNan1 = sampleNan
         progString

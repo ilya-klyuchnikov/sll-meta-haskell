@@ -5,8 +5,7 @@ import DataUtil
 import Driving
 
 ura :: Machine Conf -> Conf -> Expr -> [Subst Conf]
-ura machine conf answer = traverse [(sub0, buildConfTree machine conf)] [] where
-    sub0 = map (\n -> (n, var n)) (vnames conf)
+ura machine conf answer = traverse [(idContr conf, buildConfTree machine conf)] [] where
     traverse :: [(Subst Conf, Tree Conf)] -> [(Subst Conf, Tree Conf)] -> [Subst Conf]
     traverse [] [] = []
     traverse [] queue' = traverse queue' []
