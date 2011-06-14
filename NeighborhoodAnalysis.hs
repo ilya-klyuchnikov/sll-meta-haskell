@@ -15,14 +15,14 @@ nan' contr (Node _ (EDecompose _ cts)) (Node _ (EDecompose _ ets)) =
     foldl1 intersectContr (zipWith (nan' contr) cts ets)
 nan' contr (Node _ (ETransient _ ct)) (Node _ (ETransient _ et)) = 
     nan' contr ct et
-nan' contr (Node _ (EVariants vs)) (Node _ (ETransient (Just (CtrMatch (Pat cname _))) et)) = 
-    nan' (contr /// contr') ct et where
-        [(contr', ct)] = [(c, t) | (c@[(_, Ctr n _)], t) <- vs, n == cname]
-nan' contr (Node _ (EVariants [(contr', ct), _])) (Node _ (ETransient (Just (TestRes True)) et)) = 
-    nan' (contr /// contr') ct et
-nan' contr (Node _ (EVariants [_, (contr', ct)])) (Node _ (ETransient (Just (TestRes False)) et)) = 
-    nan' (contr /// contr') ct et
+nan' contr (Node _ (EVariants vs)) (Node _ (ETransient (Just testResult) et)) = 
+    nan' (contr /// contr') ct et where (contr', ct) = matchVariant vs testResult
 nan' contr (Leaf (Var n _)) (Leaf e) =
     contr /// [(n, e)]
 nan' contr _ _ =
     contr
+    
+matchVariant :: [(Subst Conf, Tree Conf)] -> TestResult -> (Subst Conf, Tree Conf)
+matchVariant v (CtrMatch (Pat cn _)) = head [v' | v'@([(_, Ctr n _)], t) <- v, n == cn]
+matchVariant [(contr', ct), _] (TestRes True)  = (contr', ct)
+matchVariant [_, (contr', ct)] (TestRes False) = (contr', ct)
