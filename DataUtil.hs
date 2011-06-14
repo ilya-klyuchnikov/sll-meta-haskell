@@ -30,7 +30,7 @@ gDefs (Program _ gs) gname = [g | g@(GDef x _ _ _) <- gs, x == gname]
 gDef :: Program -> Name -> Name -> GDef
 gDef p gname cname = head [g | g@(GDef _ (Pat c _) _ _) <- gDefs p gname, c == cname]
 
-(//) :: Expr -> Subst -> Expr
+(//) :: Expr -> Subst Expr -> Expr
 Ctr name args            // sub = Ctr   name (map (// sub) args)
 FCall name args          // sub = FCall name (map (// sub) args)
 GCall name args          // sub = GCall name (map (// sub) args)
@@ -45,11 +45,11 @@ Var x1 rs1               // sub = case (lookup x1 sub) of
         clear (Var x _) = var x
         clear e = e
 
-contra2sub :: Contraction Expr -> Subst
+contra2sub :: Contraction Expr -> Subst Expr
 contra2sub (Contraction v1' (Var v1 [Var v2 _])) = [(v1, Var v1 [Var v2 []]), (v2, Var v2 [Var v1 []])]
 contra2sub (Contraction v e) = [(v, e)]
 
-(///) :: Subst -> Subst -> Subst
+(///) :: Subst Expr -> Subst Expr -> Subst Expr
 (///) sub1 sub2 = map (\(k, v) -> (k, v // sub2)) sub1
 
 nameSupply :: NameSupply

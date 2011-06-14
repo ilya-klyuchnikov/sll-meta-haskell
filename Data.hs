@@ -14,9 +14,9 @@ data FDef = FDef Name [Name] Expr deriving (Eq)
 data Program = Program [FDef] [GDef] deriving (Eq)
 
 type Renaming = [(Name, Name)]
-type Subst = [Binding]
+type Subst a = [Binding a]
 type NameSupply = [Name]
-type Binding = (Name, Expr)
+type Binding a = (Name, a)
 
 type Conf = Expr
 type Value = Expr
@@ -27,9 +27,9 @@ type Env = [(Name, Value)]
 data TestResult = CtrMatch Pat | TestRes Bool
 data Contraction a = Contraction Name a
 data Step a = Transient (Maybe TestResult) a | Variants [(Contraction a, a)]
-			| Stop a | Decompose ([a] -> a) [a]
+            | Stop a | Decompose ([a] -> a) [a]
 data Edge a = ETransient (Maybe TestResult) (Graph a) | EVariants [(Contraction a, Graph a)] 
-			| EDecompose ([a] -> a) [Graph a] | EFold (Graph a) Renaming
+            | EDecompose ([a] -> a) [Graph a] | EFold (Graph a) Renaming
 data Graph a = Node a (Edge a) | Leaf a
 type Tree a = Graph a
 type Node a = Tree a
