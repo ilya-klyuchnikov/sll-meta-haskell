@@ -62,7 +62,7 @@ sampleURA prog inputConfText resultText =
     where 
         result = ura (perfectDriveMachine prog) (read inputConfText) (read resultText)
 
-sampleNan prog center conf = 
+sampleNan prog conf center = 
     putStrLn $ show $ prettySub result 
     where 
         result = nan (perfectDriveMachine prog) (read conf) (read center) 
@@ -143,36 +143,36 @@ sampleURA11 = sampleURA
 
 sampleNan1 = sampleNan
         progString
-        "fEq('A', 'A')"
         "fEq(x, y)"
+        "fEq('A', 'A')"
 
 sampleNan2 = sampleNan
         progString
-        "fEq('A', 'B')"
         "fEq(x, y)"
+        "fEq('A', 'B')"
 
 sampleNan3 = sampleNan
         progString
-        "fMatch(Cons('A', Nil()), Cons('A', Cons('A', Nil())))"
         "fMatch(x, y)"
+        "fMatch(Cons('A', Nil()), Cons('A', Cons('A', Nil())))"
         
 sampleNan4 = sampleNan 
         progString
-        "fMatch(Cons('A', Nil()), Cons('B', Cons('A', Nil())))"
         "fMatch(x, y)"
+        "fMatch(Cons('A', Nil()), Cons('B', Cons('A', Nil())))"
 
 -- compare sampleNan5 and sampleNan6
 sampleNan5 = sampleNan 
         progString
-        "P(gStrEq(Cons('A', Nil()), Cons('B', Nil())))"
         "P(gStrEq(x, Cons('B', Nil())))"
+        "P(gStrEq(Cons('A', Nil()), Cons('B', Nil())))"
 
 sampleNan6 = sampleNan 
         progString
-        "P(gStrEq(Cons('A', Nil()), Cons('B', Nil())), gStrEq(Cons('A', Nil()), Cons('C', Nil())))"
         "P(gStrEq(x, Cons('B', Nil())), gStrEq(x, Cons('C', Nil())))"
+        "P(gStrEq(Cons('A', Nil()), Cons('B', Nil())), gStrEq(Cons('A', Nil()), Cons('C', Nil())))"
         
 sampleNan7 = sampleNan
         progString
-        "P('A', fEq('A', 'B'))"
         "P(x, fEq(x, y))"
+        "P('A', fEq('A', 'B'))"
