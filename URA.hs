@@ -16,4 +16,4 @@ ura machine answer conf = traverse [(sub0, buildTree machine conf)] [] where
             Leaf a | otherwise   -> traverse queue queue'
             Node _ (ETransient _ t') -> traverse queue ((sub, t') : queue')
             Node _ (EVariants variants) -> traverse queue (queue'' ++ queue') where
-                queue'' = map (\(contra, t') -> (sub /// (contra2sub contra), t')) variants
+                queue'' = map (\(contr, t') -> (sub /// contr, t')) variants

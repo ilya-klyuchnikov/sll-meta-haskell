@@ -18,13 +18,13 @@ nan' sub (Node _ (EDecompose _ ts1)) (Node _ (EDecompose _ ts2)) = sub' where
 nan' sub (Node _ (ETransient _ t1)) (Node _ (ETransient _ t2)) = 
     nan' sub t1 t2
 nan' sub (Node _ (ETransient (Just (CtrMatch (Pat cname _))) t1)) (Node conf (EVariants xs)) = sub' where
-    Just (contr, t2) = find (\(Contraction _ (Ctr cn _), _) -> cn == cname) xs
-    sub' = nan' (sub /// contra2sub contr) t1 t2
+    [(contr, t2)] = [(contr, t2) | (contr@[(_, Ctr n _)], t2) <- xs, n == cname]
+    sub' = nan' (sub /// contr) t1 t2
 nan' sub (Node _ (ETransient (Just (TestRes res)) t1)) (Node conf (EVariants [c1, c2])) = sub' where
     (contr, t2) = case res of
         True  -> c1
         False -> c2
-    sub' = nan' (sub /// contra2sub contr) t1 t2
+    sub' = nan' (sub /// contr) t1 t2
 nan' sub (Leaf e1) (Leaf (Var n _)) =
     sub /// [(n, e1)]
 nan' sub _ _ =

@@ -39,10 +39,7 @@ instance Show GDef where
 
 instance Show Pat where
     show (Pat cn vs) = cn ++ "(" ++ withDelim ", " vs ++ ")"
-    
-instance Show a => Show (Contraction a) where
-    show (Contraction n p) = n ++ " == " ++ (show p)
-    
+
 instance Show Program where
     show (Program fs gs) = withDelim "\n" $ (map show fs) ++ (map show gs)
     

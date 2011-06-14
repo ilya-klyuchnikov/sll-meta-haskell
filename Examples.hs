@@ -87,6 +87,12 @@ sampleURA3 = sampleURA
         "'T'" 
         "gListEq(Cons('a', Cons('b', Cons('c', Cons('d', Cons('e', Cons('f', Cons('g', Nil()))))))), gFlatten(t))"
 
+-- which tree can be flatten to "ABC"?
+sampleURA3' = sampleURA 
+        progTree 
+        "'T'" 
+        "gListEq(Cons('a', Cons('b', Cons('c', Nil()))), gFlatten(t))"
+
 -- all trees of size 1
 sampleURA4 = sampleURA
         progTree
@@ -124,6 +130,16 @@ sampleURA9 = sampleURA
         progString
         "'T'"
         "gStrEq(Cons('B', Cons('B', Cons('B', Nil()))), ga2b(Cons(c, Cons(c, Cons(c, Nil())))))"
+        
+sampleURA10 = sampleURA
+        progString
+        "'F'"
+        "fMatch(x, y)"
+
+sampleURA11 = sampleURA
+        progString
+        "'T'"
+        "fMatch(x, y)"
 
 sampleNan1 = sampleNan
         progString

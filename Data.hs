@@ -25,11 +25,11 @@ type Env = [(Name, Value)]
 
 -- TestResult is used for construction of "computation paths" (trassa)
 data TestResult = CtrMatch Pat | TestRes Bool
-data Contraction a = Contraction Name a
-data Step a = Transient (Maybe TestResult) a | Variants [(Contraction a, a)]
+data Step a = Transient (Maybe TestResult) a | Variants [(Subst a, a)]
             | Stop a | Decompose ([a] -> a) [a]
-data Edge a = ETransient (Maybe TestResult) (Graph a) | EVariants [(Contraction a, Graph a)] 
+data Edge a = ETransient (Maybe TestResult) (Graph a) | EVariants [(Subst a, Graph a)] 
             | EDecompose ([a] -> a) [Graph a] | EFold (Graph a) Renaming
+
 data Graph a = Node a (Edge a) | Leaf a
 type Tree a = Graph a
 type Node a = Tree a
