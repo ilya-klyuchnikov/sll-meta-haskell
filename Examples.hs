@@ -57,15 +57,25 @@ progTree = read
     \ gListEq2(Nil()) = 'T'; \
     \ gListEq2(Cons(y, ys)) = 'F';"
 
-sampleURA prog inputConfText resultText =
-    putStrLn $ show $ map prettySub result 
-    where 
-        result = ura (perfectDriveMachine prog) (read inputConfText) (read resultText)
+sampleURA prog inputConfText resultText = do
+    putStrLn "task:"
+    putStrLn ("\t" ++ (show input) ++ " -> " ++ (show output)) 
+    putStrLn "answer:"
+    putStrLn $ withDelim "\n" $ map (("\t" ++) . show) $ map prettySub result 
+    where
+        input = (read inputConfText) :: Expr
+        output = (read resultText) :: Expr
+        result = ura (perfectDriveMachine prog) input output
 
-sampleNan prog conf center = 
-    putStrLn $ show $ prettySub result 
-    where 
-        result = nan (perfectDriveMachine prog) (read conf) (read center) 
+sampleNan prog conf center = do
+    putStrLn "task:"
+    putStrLn ("\t" ++ (show inputConf) ++ " <> " ++ (show inputData)) 
+    putStrLn "answer:"
+    putStrLn $ ("\t" ++) $ show $ prettySub result 
+    where
+        inputConf = (read conf) :: Expr
+        inputData = (read center) :: Expr
+        result = nan (perfectDriveMachine prog) inputConf inputData 
 
 prettySub = map (\(x, y) -> (x, prettyVar y))
 
