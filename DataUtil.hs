@@ -70,7 +70,26 @@ isRepeated vn e = (length $ filter (== vn) (vnames' e)) > 1
 
 -- TODO
 renaming :: Expr -> Expr -> Maybe Renaming
-renaming = undefined
+renaming e1 e2 | skel e1 == skel e2 = if can e2 == can (e1 // sub) then Just (nub ren) else Nothing where
+    ren = zip (vnames' e1) (vnames' e2)
+    sub = zip (vnames' e1) (map (\v -> Var v[]) (vnames' e2))
+renaming e1 e2 | otherwise          = Nothing
+
+skel :: Expr -> Expr
+skel (Var _ _) = Var "$" []
+skel (Atom a) = (Atom a)
+skel (Ctr c args)   = Ctr c (map skel args)
+skel (FCall f args) = FCall f (map skel args)
+skel (GCall g args) = GCall g (map skel args)
+skel (TestEq (a1, a2) (e1, e2)) = (TestEq (skel a1, skel a2) (skel e1, skel e2))
+
+can :: Expr -> Expr
+can (Var v rs) = Var v (sort rs)
+can (Atom a) = (Atom a)
+can (Ctr c args)   = Ctr c (map can args)
+can (FCall f args) = FCall f (map can args)
+can (GCall g args) = GCall g (map can args)
+can (TestEq (a1, a2) (e1, e2)) = (TestEq (can a1, can a2) (can e1, can e2))
 
 nodeLabel :: Node a -> a
 nodeLabel (Node l _) = l

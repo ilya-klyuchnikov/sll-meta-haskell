@@ -6,7 +6,7 @@ data Expr = Var Name [Expr]
           | Ctr Name [Expr] 
           | TestEq (Expr, Expr) (Expr, Expr)
           | FCall Name [Expr] | GCall Name [Expr] 
-            deriving (Eq)
+            deriving (Eq, Ord)
 
 data Pat = Pat Name [Name] deriving (Eq)
 data GDef = GDef Name Pat [Name] Expr deriving (Eq)

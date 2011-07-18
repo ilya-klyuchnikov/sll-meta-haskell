@@ -174,6 +174,9 @@ demo23 =
     putStrLn $ printTree $ buildConfTree (perfectDriveMachine progMatch) 
         (read "fMatch(x, Cons('A', Cons('B', Nil())))")
 
+demo24 =
+    putStrLn $ printTree $ foldTree $ buildConfTree (perfectDriveMachine progMatch) 
+        (read "fMatch(Cons('A', Cons('A', Nil())), s)")
 
 main = do
     putStrLn "\ndemo06"
