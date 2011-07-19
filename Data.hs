@@ -23,7 +23,7 @@ type Value = Expr
 type Task = (Conf, Program)
 type Env = [(Name, Value)]
 
--- TestResult is used for construction of "computation paths" (trassa)
+-- TestResult is used for construction of evaluation trace
 data TestResult = CtrMatch Pat | TestRes Bool
 data Step a = Transient (Maybe TestResult) a | Variants [(Subst a, a)]
             | Stop a | Decompose ([a] -> a) [a]
