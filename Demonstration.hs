@@ -150,10 +150,6 @@ demo14 =
 demo15 =
     putStrLn $ printTree $ foldTree $ buildConfTree (confMachine prog1) (read "gEven(fSqr(x))")
     
--- successful folding (tex)
-demo15a =
-    putStrLn $ pprintLTree $ foldTree $ buildConfTree (confMachine prog1) (read "gEven(fSqr(x))")
-
 -- an example of "not foldable" tree
 demo16 =
     putStrLn $ printTree $ foldTree $ buildConfTree (confMachine prog1) (read "gAdd1(x, y)")

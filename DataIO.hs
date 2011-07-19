@@ -49,19 +49,6 @@ instance Show a => Show (Step a) where
     show (Stop _) = "!"
     show (Decompose _ ds) = "DEC " ++ (show ds)
 
--- Latex
-pprintLTree :: Graph Conf -> String
-pprintLTree (Leaf expr) = "node[conf]{" ++ (show expr) ++ "}"
-pprintLTree (Node expr next) = make next where
-    make (EFold _ _) = "node[conf]{" ++ (show expr) ++ "}"
-    make (ETransient _ t) = "node[conf]{" ++ (show expr) ++ "}\nchild[->]{" ++ (pprintLTree t) ++ "}"
-    make (EDecompose _ ts) = "node[conf]{" ++ (show expr) ++ "}" ++ 
-        (concat (map (\t -> "\nchild[->]{" ++ (pprintLTree t) ++ "}") ts))
-    make (EVariants [(x1, t1), (x2, t2)]) = 
-        "node[conf]{" ++ (show expr) ++ "}" ++ 
-            ("\nchild[->]{" ++ (pprintLTree t1) ++ "\nedge from parent node[left,label,xshift=-5mm]{" ++ (show x1) ++ "}}") ++
-            ("\nchild[->]{" ++ (pprintLTree t2) ++ "\nedge from parent node[right,label,xshift=5mm]{" ++ (show x2) ++ "}}")
-
 withDelim :: [a] -> [[a]] -> [a]
 withDelim xs xss = concat (intersperse xs xss)
 
