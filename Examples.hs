@@ -4,6 +4,7 @@ import Data
 import DataUtil
 import DataIO
 import Driving
+import Folding
 
 import NeighborhoodAnalysis
 import URA
@@ -186,3 +187,7 @@ sampleNan7 = sampleNan
         progString
         "P(x, fEq(x, y))"
         "P('A', fEq('A', 'B'))"
+
+sampleSC =
+    putStrLn $ printTree $ foldTree $ buildConfTree (perfectDriveMachine progString) 
+        (read "fMatch(Cons('A', Cons('A', Nil())), s)")
