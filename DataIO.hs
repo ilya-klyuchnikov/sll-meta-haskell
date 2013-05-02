@@ -2,9 +2,8 @@ module DataIO where
 
 import Data
 import DataUtil
-import Maybe
-import Char
-import List
+import Data.Maybe
+import Data.Char
 import Data.List
 
 printTree t = unlines $ take 1000 $ pprintTree "" "" t

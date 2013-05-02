@@ -1,9 +1,9 @@
 module DataUtil where
 
 import Data
-import Maybe
-import Char
-import List
+import Data.Maybe
+import Data.Char
+import Data.List
 
 var :: Name -> Expr
 var n = Var n []
