@@ -128,10 +128,22 @@ readGDef i = do
     (";", s6) <- lex s5
     return (GDef n p vs body, s6)
 
-readProgram :: ReadS Program
-readProgram s = [readP1 (Program [] []) s] where
+data Comment = Comment String
 
-readP1 p@(Program fs gs) s = oneOf (readFDef s) (readGDef s) where
-    oneOf [(f, s1)] _ = readP1 (Program (fs++[f]) gs) s1
-    oneOf _ [(g, s1)] = readP1 (Program fs (gs++[g])) s1
-    oneOf _ _ = (p, s)
+readComment :: ReadS ()
+readComment i = readComment1 (dropWhile isSpace i)
+
+readComment1 ('{' : '-' : s) = readComment2 s
+readComment1 _               = []
+readComment2 ('-' : '}' : s) = [((), s)]
+readComment2 (_ : s)         = readComment2 s
+readComment2 []              = []
+
+readProgram :: ReadS Program
+readProgram s = [readProgram' (Program [] []) s]
+
+readProgram' p@(Program fs gs) s = oneOf (readComment s) (readFDef s) (readGDef s) where
+    oneOf [(_, s1)] _ _ = readProgram' (Program  fs       gs) s1
+    oneOf _ [(f, s1)] _ = readProgram' (Program (fs++[f]) gs) s1
+    oneOf _ _ [(g, s1)] = readProgram' (Program fs (gs++[g])) s1
+    oneOf _ _ _ = (p, s)

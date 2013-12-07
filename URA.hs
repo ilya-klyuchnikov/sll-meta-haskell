@@ -4,6 +4,8 @@ import Data
 import DataUtil
 import Driving
 
+-- finds all possible substitution for IN configuration (`conf`)
+-- given an OUT value (`answer`)
 ura :: Machine Conf -> Conf -> Expr -> [Subst Conf]
 ura machine conf answer = traverse [(idContr conf, buildConfTree machine conf)] where
     traverse :: [(Subst Conf, Tree Conf)] -> [Subst Conf]

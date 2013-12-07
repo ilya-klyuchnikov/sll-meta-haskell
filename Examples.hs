@@ -1,65 +1,78 @@
 module Examples where
 
+import System.Timeout
+
 import Data
 import DataUtil
 import DataIO
 import Driving
-import Folding
 
 import NeighborhoodAnalysis
 import URA
 
 progString :: Program
-progString = read
-    " fMatch(p, s) = gM(p, s, p, s);\
-    \ gM(Nil(), ss, op, os) = 'T';\
-    \ gM(Cons(p, pp), ss, op, os) = gX(ss, p, pp, op, os);\
-    \ gX(Nil(), p, pp,  op, os) = 'F';\
-    \ gX(Cons(s, ss), p, pp,  op, os) = if(s, p, gM(pp, ss, op, os), gN(os, op));\
-    \ gN(Nil(), op) = False(); \
-    \ gN(Cons(s, ss), op) = gM(op, ss, op, ss); \
-    \ fEq(x, y) = if(x, y, 'T', 'F'); \
-    
-    \ ga2b(Nil()) = Nil(); \
-    \ ga2b(Cons(x, xs)) = if(x, 'A', Cons('B', ga2b(xs)), Cons(x, ga2b(xs))); \
-    
-    \ gStrEq(Cons(a1, s1), s2) = gStrEq1(s2, a1, s1); \ 
-    \ gStrEq(Nil(), s2) = gStrEq2(s2); \ 
-    \ gStrEq1(Cons(a2, s2), a1, s1) = if(a1, a2, gStrEq(s1, s2), 'F'); \
-    \ gStrEq1(Nil(), a1, s1) = 'F'; \
-    \ gStrEq2(Nil()) = 'T'; \
-    \ gStrEq2(Cons(x, xs)) = 'F'; "
+progString = read "                                                            \ 
+\ {- Is `p` a substring of `s`? -}                                             \
+\ fMatch(p, s) = gM(p, s, p, s);                                               \
+\ gM(Nil(), ss, op, os) = 'T';                                                 \
+\ gM(Cons(p, pp), ss, op, os) = gX(ss, p, pp, op, os);                         \
+\ gX(Nil(), p, pp,  op, os) = 'F';                                             \
+\ gX(Cons(s, ss), p, pp,  op, os) = if(s, p, gM(pp, ss, op, os), gN(os, op));  \
+\ gN(Nil(), op) = False();                                                     \
+\ gN(Cons(s, ss), op) = gM(op, ss, op, ss);                                    \
+\                                                                              \
+\ {- Are `x` and `y` equal? -}                                                 \
+\ fEq(x, y) = if(x, y, 'T', 'F');                                              \
+\                                                                              \
+\ {- replaces all 'a to 'b -}                                                  \
+\ ga2b(Nil()) = Nil();                                                         \
+\ ga2b(Cons(x, xs)) = if(x, 'A', Cons('B', ga2b(xs)), Cons(x, ga2b(xs)));      \
+\                                                                              \
+\ {- gStrEq(s1, s2) -- string equality -}                                      \
+\ gStrEq(Cons(a1, s1), s2) = gStrEq1(s2, a1, s1);                              \
+\ gStrEq(Nil(), s2) = gStrEq2(s2);                                             \ 
+\ gStrEq1(Cons(a2, s2), a1, s1) = if(a1, a2, gStrEq(s1, s2), 'F');             \
+\ gStrEq1(Nil(), a1, s1) = 'F';                                                \
+\ gStrEq2(Nil()) = 'T';                                                        \
+\ gStrEq2(Cons(x, xs)) = 'F';                                                  "
 
 progTree :: Program
-progTree = read
-    " gFlatten(Leaf(a)) = Cons(a, Nil()); \
-    \ gFlatten(Node(lTree, s, rTree)) = gAppend(gFlatten(lTree), Cons(s, gFlatten(rTree))); \
-    
-    \ gAppend(Nil(), ys) = ys; \
-    \ gAppend(Cons(x, xs), ys) = Cons(x, gAppend(xs, ys)); \
-    
-    \ gAdd(Z(), y) = y;\
-    \ gAdd(S(x), y) = S(gAdd(x, y));\
-    
-    \ gEq(Z(), y) = gEqZ(y); \
-    \ gEq(S(x), y) = gEqS(y, x); \
-    \ gEqZ(Z()) = 'T'; \
-    \ gEqZ(S(x)) = 'F'; \
-    \ gEqS(Z(), x) = 'F'; \
-    \ gEqS(S(y), x) = gEq(x, y); \
-    
-    \ gSize(Leaf(a)) = S(Z()); \
-    \ gSize(Node(lTree, s, rTree)) = S(gAdd(gSize(lTree), gSize(rTree))); \
-    
-    \ gListEq(Cons(x, xs), ys) = gListEq1(ys, x, xs); \ 
-    \ gListEq(Nil(), ys) = gListEq2(ys); \ 
-    \ gListEq1(Cons(y, ys), x, xs) = if(x, y, gListEq(xs, ys), 'F'); \
-    \ gListEq1(Nil(), x, xs) = 'F'; \
-    \ gListEq2(Nil()) = 'T'; \
-    \ gListEq2(Cons(y, ys)) = 'F';"
+progTree = read "                                                                       \
+\ {- list concatenation -}                                                              \
+\ gAppend(Nil(), ys) = ys;                                                              \
+\ gAppend(Cons(x, xs), ys) = Cons(x, gAppend(xs, ys));                                  \
+\                                                                                       \
+\ {- tree flattening -}                                                                 \
+\ gFlatten(Leaf(a)) = Cons(a, Nil());                                                   \
+\ gFlatten(Node(lTree, s, rTree)) = gAppend(gFlatten(lTree), Cons(s, gFlatten(rTree))); \
+\                                                                                       \   
+\ gAdd(Z(), y) = y;                                                                     \
+\ gAdd(S(x), y) = S(gAdd(x, y));                                                        \
+\                                                                                       \
+\ {- nat equality -}                                                                    \
+\ gEq(Z(), y) = gEqZ(y);                                                                \
+\ gEq(S(x), y) = gEqS(y, x);                                                            \
+\ gEqZ(Z()) = 'T';                                                                      \
+\ gEqZ(S(x)) = 'F';                                                                     \
+\ gEqS(Z(), x) = 'F';                                                                   \
+\ gEqS(S(y), x) = gEq(x, y);                                                            \
+\                                                                                       \
+\ {- tree size -}                                                                       \
+\ gSize(Leaf(a)) = S(Z());                                                              \
+\ gSize(Node(lTree, s, rTree)) = S(gAdd(gSize(lTree), gSize(rTree)));                   \
+\                                                                                       \
+\ {- list equality -}                                                                   \
+\ gListEq(Cons(x, xs), ys) = gListEq1(ys, x, xs);                                       \ 
+\ gListEq(Nil(), ys) = gListEq2(ys);                                                    \ 
+\ gListEq1(Cons(y, ys), x, xs) = if(x, y, gListEq(xs, ys), 'F');                        \
+\ gListEq1(Nil(), x, xs) = 'F';                                                         \
+\ gListEq2(Nil()) = 'T';                                                                \
+\ gListEq2(Cons(y, ys)) = 'F';                                                          "
 
+-- helper function to run URA demonstration
+sampleURA :: Program -> String -> String -> IO ()
 sampleURA prog inputConfText resultText = do
-    putStrLn "task:"
+    putStrLn "===================\nURA task:"
     putStrLn ("\t" ++ (show input) ++ " -> " ++ (show output)) 
     putStrLn "answer:"
     putStrLn $ withDelim "\n" $ map (("\t" ++) . show) $ map prettySub result 
@@ -68,8 +81,9 @@ sampleURA prog inputConfText resultText = do
         output = (read resultText) :: Expr
         result = ura (perfectDriveMachine prog) input output
 
+sampleNan :: Program -> String -> String -> IO ()
 sampleNan prog conf center = do
-    putStrLn "task:"
+    putStrLn "===================\nNAN task:"
     putStrLn ("\t" ++ (show inputConf) ++ " <> " ++ (show inputData)) 
     putStrLn "answer:"
     putStrLn $ ("\t" ++) $ show $ prettySub result 
@@ -93,12 +107,14 @@ sampleURA2 = sampleURA
         "'F'" 
                 
 -- which tree can be flatten to "ABCDEFG"?
+-- no termination here
 sampleURA3 = sampleURA 
         progTree 
         "gListEq(Cons('a', Cons('b', Cons('c', Cons('d', Cons('e', Cons('f', Cons('g', Nil()))))))), gFlatten(t))"
         "'T'" 
 
 -- which tree can be flatten to "ABC"?
+-- no termination here
 sampleURA3' = sampleURA 
         progTree 
         "gListEq(Cons('a', Cons('b', Cons('c', Nil()))), gFlatten(t))"
@@ -123,6 +139,7 @@ sampleURA6 = sampleURA
         "'T'"
    
 -- all trees whose flattened representations are the same
+-- no termination
 sampleURA7 = sampleURA
         progTree
         "gListEq(gFlatten(tl), gFlatten(tr))"
@@ -130,23 +147,27 @@ sampleURA7 = sampleURA
 
 -- see example in
 -- "Faster Answers and Improved Termination in Inverse Computation of Non-Flat Languages"
+-- strings that equal to "B" after replacing all 'A' -> 'B'
 sampleURA8 = sampleURA
         progString
         "gStrEq(Cons('B', Nil()), ga2b(s))"
         "'T'"
 
 -- see example in
--- "Faster Answers and Improved Termination in Inverse Computation of Non-Flat Languages"        
+-- "Faster Answers and Improved Termination in Inverse Computation of Non-Flat Languages"
+-- strings that equal to "BBB" after replacing all 'A' -> 'B'
 sampleURA9 = sampleURA
         progString
         "gStrEq(Cons('B', Cons('B', Cons('B', Nil()))), ga2b(Cons(c, Cons(c, Cons(c, Nil())))))"
         "'T'"
-        
+
+-- (x, y) such that x IS NOT a substring of y
 sampleURA10 = sampleURA
         progString
         "fMatch(x, y)"
         "'F'"
 
+-- (x, y) such that x IS a substring of y
 sampleURA11 = sampleURA
         progString
         "fMatch(x, y)"
@@ -188,6 +209,40 @@ sampleNan7 = sampleNan
         "P(x, fEq(x, y))"
         "P('A', fEq('A', 'B'))"
 
-sampleSC =
-    putStrLn $ printTree $ foldTree $ buildConfTree (perfectDriveMachine progString) 
-        (read "fMatch(Cons('A', Cons('A', Nil())), s)")
+-- smart runner 
+-- if some sample doesn't terminate in timeout, it will add ..............
+-- to the output
+run :: IO () -> IO ()
+run sample = do
+    res <- (timeout 2000000 sample)
+    case res of
+        Nothing -> do 
+            putStrLn "\n............"
+            putStrLn "............"
+            return ()
+        Just _ -> do
+            return ()
+
+main :: IO ()
+main = do
+    run sampleURA1
+    run sampleURA2
+    run sampleURA3
+    run sampleURA3'
+    run sampleURA4
+    run sampleURA5
+    run sampleURA6
+    run sampleURA7
+    run sampleURA8
+    run sampleURA9
+    -- infinite number of answers
+    -- run sampleURA10
+    -- run sampleURA11
+    run sampleNan1
+    run sampleNan2
+    run sampleNan3
+    run sampleNan4
+    run sampleNan5
+    run sampleNan6
+    run sampleNan7
+    return ()
