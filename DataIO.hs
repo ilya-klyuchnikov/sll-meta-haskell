@@ -91,8 +91,14 @@ readVars' s = case lex s of
 
 readExpr :: ReadS Expr
 readExpr s = case lex s of 
-    [("if", s1)] -> [(TestEq (a1, a2) (e1, e2), s2)] where
-        [([a1, a2, e1, e2], s2)] = readArgs s1
+    [("if", s1)] -> [(TestEq (a1, a2) (e1, e2), s8)] where
+        [(a1,     s2)] = readExpr s1
+        [("=",    s3)] = lex s2
+        [(a2,     s4)] = readExpr s3
+        [("then", s5)] = lex s4
+        [(e1,     s6)] = readExpr s5
+        [("else", s7)] = lex s6
+        [(e2,     s8)] = readExpr s7
     [(n@('g':_), s1)] -> [(GCall n args, s2)] where
         [(args, s2)] = readArgs s1
     [(n@('f':_), s1)] -> [(FCall n args, s2)] where
@@ -127,8 +133,6 @@ readGDef i = do
     (body, s5) <- readExpr s4
     (";", s6) <- lex s5
     return (GDef n p vs body, s6)
-
-data Comment = Comment String
 
 readComment :: ReadS ()
 readComment i = readComment1 (dropWhile isSpace i)
