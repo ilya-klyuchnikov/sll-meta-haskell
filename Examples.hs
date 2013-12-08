@@ -185,6 +185,11 @@ sampleURA11 = sampleURA
         "fMatch(x, y)"
         "'T'"
 
+sampleURA12 = sampleURA 
+        progTree
+        "gListEq(Cons('a', Nil()), gFlatten(t))"
+        "'T'"
+
 sampleNan1 = sampleNan
         progString
         "fEq(x, y)"
@@ -221,6 +226,10 @@ sampleNan7 = sampleNan
         "P(x, fEq(x, y))"
         "P('A', fEq('A', 'B'))"
 
+sampleSC =
+    putStrLn $ printTree $ buildProcessTree (perfectDriveMachine progTree) 
+        (read "gListEq(Cons('a', Nil()), gFlatten(t))")
+
 -- smart runner 
 -- if some sample doesn't terminate in timeout, it will add ..............
 -- to the output
@@ -250,6 +259,7 @@ main = do
     -- infinite number of answers
     -- run sampleURA10
     -- run sampleURA11
+    run sampleURA12
     run sampleNan1
     run sampleNan2
     run sampleNan3

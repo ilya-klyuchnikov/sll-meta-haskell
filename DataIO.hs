@@ -6,7 +6,7 @@ import Data.Maybe
 import Data.Char
 import Data.List
 
-printTree t = unlines $ take 1000 $ pprintTree "" "" t
+printTree t = unlines $ take 90 $ pprintTree "" "" t
 
 pprintTree :: String -> String -> Graph Conf -> [String]
 pprintTree indent msg (Node expr next) = make next where

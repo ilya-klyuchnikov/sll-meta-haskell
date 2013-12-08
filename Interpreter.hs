@@ -2,11 +2,11 @@ module Interpreter where
 import Data
 import DataUtil
 
-buildExprTree :: Machine Expr -> Expr -> Tree Expr
-buildExprTree m c = case m c of
+buildEvaluationTree :: Machine Expr -> Expr -> Tree Expr
+buildEvaluationTree m c = case m c of
     Stop e -> Leaf e
-    Transient test e -> Node c (ETransient test (buildExprTree m e))
-    Decompose comp ds -> Node c (EDecompose comp (map (buildExprTree m) ds))
+    Transient test e -> Node c (ETransient test (buildEvaluationTree m e))
+    Decompose comp ds -> Node c (EDecompose comp (map (buildEvaluationTree m) ds))
 
 exprMachine :: Program -> Machine Expr
 exprMachine p = step where
@@ -33,7 +33,7 @@ exprMachine p = step where
         Transient (Just (TestRes False)) e2
 
 eval :: Program -> Expr -> Expr
-eval p = intExprTree . buildExprTree (exprMachine p)
+eval p = intExprTree . buildEvaluationTree (exprMachine p)
 
 intExprTree :: Tree Expr -> Expr
 intExprTree (Leaf e) = e

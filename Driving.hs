@@ -4,12 +4,12 @@ import Data
 import DataUtil
 import Interpreter
 
-buildConfTree :: Machine Conf -> Conf -> Tree Conf
-buildConfTree m c = case m c of
+buildProcessTree :: Machine Conf -> Conf -> Tree Conf
+buildProcessTree m c = case m c of
     Stop e -> Leaf e
-    Transient test e -> Node c (ETransient test (buildConfTree m e))
-    Decompose comp ds -> Node c (EDecompose comp (map (buildConfTree m) ds))
-    Variants cs -> Node c (EVariants [(c, buildConfTree m e) | (c, e) <- cs])
+    Transient test e -> Node c (ETransient test (buildProcessTree m e))
+    Decompose comp ds -> Node c (EDecompose comp (map (buildProcessTree m) ds))
+    Variants cs -> Node c (EVariants [(c, buildProcessTree m e) | (c, e) <- cs])
 
 confMachine :: Program -> Machine Conf
 confMachine p = step where

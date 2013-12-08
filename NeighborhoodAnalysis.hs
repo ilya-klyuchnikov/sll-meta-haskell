@@ -1,4 +1,4 @@
-module NeighborhoodAnalysis(nan) where
+module NeighborhoodAnalysis (nan) where
 
 import Data
 import DataUtil
@@ -8,7 +8,7 @@ import Interpreter
 import Data.List
 
 nan :: Machine Conf -> Conf -> Expr -> Subst Conf
-nan m conf expr = nan' (idContr conf) (buildConfTree m conf) (buildExprTree m expr)
+nan m conf expr = nan' (idContr conf) (buildProcessTree m conf) (buildEvaluationTree m expr)
 
 nan' :: Subst Conf -> Tree Conf -> Tree Expr -> Subst Conf
 nan' contr (Node _ (EDecompose _ cts)) (Node _ (EDecompose _ ets)) = 
