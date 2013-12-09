@@ -6,9 +6,12 @@ import Driving
 
 -- finds all possible substitution for IN configuration (`conf`)
 -- given an OUT value (`answer`)
-ura :: Machine Conf -> Conf -> Expr -> [Subst Conf]
+-- Here we assume that we will not encounter decompose steps
+-- however, if we encounter decompose, we need to make "split" and proceed into 
+-- subtasks
+ura :: Machine Expr -> Expr -> Expr -> [Subst Expr]
 ura machine conf answer = traverse [(idContr conf, buildProcessTree machine conf)] where
-    traverse :: [(Subst Conf, Tree Conf)] -> [Subst Conf]
+    traverse :: [(Subst Expr, Tree Expr)] -> [Subst Expr]
     traverse [] = []
     traverse ((sub, t) : queue) =
         case t of

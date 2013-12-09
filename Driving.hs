@@ -4,16 +4,16 @@ import Data
 import DataUtil
 import Interpreter
 
-buildProcessTree :: Machine Conf -> Conf -> Tree Conf
+buildProcessTree :: Machine Expr -> Expr -> Tree Expr
 buildProcessTree m c = case m c of
     Stop e -> Leaf e
     Transient test e -> Node c (ETransient test (buildProcessTree m e))
     Decompose comp ds -> Node c (EDecompose comp (map (buildProcessTree m) ds))
     Variants cs -> Node c (EVariants [(c, buildProcessTree m e) | (c, e) <- cs])
 
-confMachine :: Program -> Machine Conf
+confMachine :: Program -> Machine Expr
 confMachine p = step where
-    step :: Machine Conf
+    step :: Machine Expr
     step (GCall gn args) | isVar (head args) = 
         Variants (map (scrutinize args) (gDefs p gn))
     step (GCall gn (arg:args)) | reducible arg , Variants cs <- step arg = 
@@ -27,7 +27,7 @@ confMachine p = step where
     step e@(Var _ _) = Stop e
     step e = exprMachine p e
         
-perfectDriveMachine :: Program -> Machine Conf
+perfectDriveMachine :: Program -> Machine Expr
 perfectDriveMachine  = (propagateContraction .) . confMachine
 
 scrutinize ::  [Expr] -> GDef -> (Subst Expr, Expr)
@@ -36,6 +36,6 @@ scrutinize ((Var v _) : args) (GDef _ pat@(Pat cn cvs) vs body) =
         fresh =  makeFreshVars v pat
         sub = zip (cvs ++ vs) (fresh ++ args)
 
-propagateContraction :: Step Conf -> Step Conf
+propagateContraction :: Step Expr -> Step Expr
 propagateContraction (Variants vs) = Variants [(c, e // c) | (c, e) <- vs]
 propagateContraction step = step

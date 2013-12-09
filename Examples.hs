@@ -81,6 +81,33 @@ progTree = read "                                                           \
 \ gListEq2(Nil()) = 'T';                                                    \
 \ gListEq2(Cons(y, ys)) = 'F';                                              "
 
+progList :: Program
+progList = read "                                                           \
+\                                                                           \
+\ {- tree size -}                                                           \
+\ gContains(Nil(), y) = F();                                                \
+\ gContains(Cons(x, xs), y) = if x=y then T() else gContains(xs, ys);       \
+\                                                                           \
+\ fSize(xs) = gSize1(xs, Z());                                              \
+\                                                                           \
+\ {- helper function in flat form -}                                        \
+\ gSize1(Nil(), acc)       = acc;                                           \
+\ gSize1(Cons(x, xs), acc) = gSize1(xs, S(acc));                            \
+
+\ {- helper function in flat form -}                                        \
+\ gT(Z(), acc)  = acc;                                                      \
+\ gT(S(n), acc) = gT(n, F());                                               \
+\                                                                           \
+\ gEqNat(Z(), m)  = gEqZ(m);                                                \
+\ gEqNat(S(n), m) = gEqS(m, n);                                             \
+\ gEqZ(Z())  = T();                                                         \
+\ gEqZ(S(n)) = F();                                                         \
+\ gEqS(Z(), n)  = F();                                                      \
+\ gEqS(S(m), n) = gEqNat(n, m);                                             \
+\ gAnd(F(), b) = F();                                                       \
+\ gAnd(T(), b) = b;                                                         \
+\                                                                           "
+
 -- helper function to run URA demonstration
 sampleURA :: Program -> String -> String -> IO ()
 sampleURA prog inputConfText resultText = do
@@ -116,8 +143,8 @@ sampleURA1 = sampleURA
 sampleURA2 = sampleURA 
         progString 
         "fMatch(x, Cons('A', Cons('B', Nil())))"
-        "'F'" 
-                
+        "'F'"
+
 -- which tree can be flatten to "ABCDEFG"?
 -- no termination here
 sampleURA3 = sampleURA 
@@ -226,9 +253,92 @@ sampleNan7 = sampleNan
         "P(x, fEq(x, y))"
         "P('A', fEq('A', 'B'))"
 
-sampleSC =
-    putStrLn $ printTree $ buildProcessTree (perfectDriveMachine progTree) 
-        (read "gListEq(Cons('a', Nil()), gFlatten(t))")
+-- which tree can be flatten to "A"?
+-- no termination here
+sampleURA20 = sampleURA 
+        progTree 
+        "gListEq(Cons('a', Nil()), gFlatten(t))"
+        "'T'"
+
+-- but we try to mitigate it step-by-step
+-- we abstract let ls = flatten(t)
+-- this gives an answer ls -> Cons('a', Nil())
+sampleURA13 = sampleURA 
+        progTree
+        "gListEq(Cons('a', Nil()), ls)"
+        "'T'"
+
+-- next, we looking into definition of flatten
+-- gFlatten(Leaf(a)) = Cons(a, Nil());                                      
+-- gFlatten(Node(lt, s, rt)) = gAppend(gFlatten(lt), Cons(s, gFlatten(rt)));
+-- and consider 2 variants
+
+-- this variant gives a -> 'a'
+sampleURA21a = sampleURA
+        progTree
+        "gListEq(Cons('a', Nil()), gFlatten(Leaf(a)))"
+        "'T'"
+
+-- this variant haltls
+sampleURA21b = sampleURA
+        progTree
+        "gListEq(Cons('a', Nil()), gFlatten(Node(lt, s, rt)))"
+        "'T'"
+
+-- we abstract
+-- l1 = gFlatten(lt)
+-- l2 = gFlatten(rt)
+-- and get answers: l1 = Nil, l2 = Nil
+sampleURA21c = sampleURA
+        progTree
+        "gListEq(Cons('a', Nil()), gAppend(l1, Cons(s, l2)))"
+        "'T'"
+
+-- continue. This halts
+sampleURA22a = sampleURA
+        progTree
+        "gListEq(Nil(), gFlatten(lt))"
+        "'T'"
+
+-- again, we consider two variants
+-- 1) empty answer
+sampleURA22b = sampleURA
+        progTree
+        "gListEq(Nil(), gFlatten(Leaf(x)))"
+        "'T'"
+-- we abstract
+-- l1 = gFlatten(lt)
+-- l2 = gFlatten(rt)
+-- empty answer
+sampleURA22c = sampleURA
+        progTree
+        "gListEq(Nil(), gAppend(l1, Cons(s, l2)))"
+        "'T'"
+
+sampleURA30 = sampleURA
+        progList
+        "gEqNat(x, S(Z()))"
+        "T()"
+
+sampleURA31 = sampleURA
+        progList
+        "gContains(x, 'a')"
+        "T()"
+
+-- this doesn't terminate -
+-- but this is non-flat expression!!
+sampleURA32 = sampleURA
+        progList
+        "gEqNat( fSize(x), S(Z()) )"
+        "T()"
+
+-- The simplest non-termination of URA for flat function
+-- is there a simple way to analyze it??
+sampleURA33 = sampleURA
+        progList
+        "gT(x, T())"
+        "F()"
+
 
 -- smart runner 
 -- if some sample doesn't terminate in timeout, it will add ..............
@@ -259,7 +369,7 @@ main = do
     -- infinite number of answers
     -- run sampleURA10
     -- run sampleURA11
-    run sampleURA12
+    --run sampleURA12
     run sampleNan1
     run sampleNan2
     run sampleNan3

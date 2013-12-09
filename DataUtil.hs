@@ -91,7 +91,7 @@ can (FCall f args) = FCall f (map can args)
 can (GCall g args) = GCall g (map can args)
 can (TestEq (a1, a2) (e1, e2)) = (TestEq (can a1, can a2) (can e1, can e2))
 
-nodeLabel :: Node a -> a
+nodeLabel :: Tree a -> a
 nodeLabel (Node l _) = l
 nodeLabel (Leaf l) = l
 
@@ -122,7 +122,7 @@ reducible (GCall _ _)  = True
 reducible (TestEq _ _) = True
 reducible _            = False
 
-test :: (Conf, Conf) -> Either Bool (Subst Conf, Subst Conf)
+test :: (Expr, Expr) -> Either Bool (Subst Expr, Subst Expr)
 test (Var a1 rs1, Var a2 rs2)
     | a1 == a2 = Left True
     | (Var a2 []) `elem` rs1 = Left False
@@ -142,7 +142,7 @@ test (a@(Atom _), Var v rs)
 test (a1@(Atom _), a2@(Atom _)) =
     Left (a1 == a2)
 
-intersectContr :: Subst Conf -> Subst Conf -> Subst Conf
+intersectContr :: Subst Expr -> Subst Expr -> Subst Expr
 intersectContr s1 s2 = intersection where
     intersection = zip keys $ zipWith mergeRestrictions vals1' vals2'
     keys  = map fst s1
@@ -152,27 +152,27 @@ intersectContr s1 s2 = intersection where
     vals1' = map (// sub) vals1
     vals2' = map (// sub) vals2
 
-mergeRestrictions :: Conf -> Conf -> Conf
+mergeRestrictions :: Expr -> Expr -> Expr
 mergeRestrictions (Ctr n1 args1) (Ctr n2 args2) | n1 == n2 =
     Ctr n1 (zipWith mergeRestrictions args1 args2)
 mergeRestrictions (Var v1 rs1) (Var v2 rs2) | v1 == v2 =
     Var v1 (union rs1 rs2)
-mergeRestrictions e1 e2 | e1 == e2 = 
+mergeRestrictions e1 e2 | e1 == e2 =
     e1
 
-mgu :: [(Conf, Conf)] -> Subst Conf
+mgu :: [(Expr, Expr)] -> Subst Expr
 mgu [] = []
-mgu (eq : eqs) = 
-    case eq of 
+mgu (eq : eqs) =
+    case eq of
         (e1, e2) | e1 == e2 -> mgu eqs
         (Ctr n1 args1, Ctr n2 args2) -> mgu ((zip args1 args2) ++ eqs)
         (Var v1 rs1, Var v2 rs2) -> mgu' [(max v1 v2, var (min v1 v2))]
         (Var v1 _, e2) -> mgu' [(v1, e2)]
         (e1, Var v2 _) -> mgu' [(v2, e1)]
     where
-        mgu' s = (s /// sub) ++ sub 
+        mgu' s = (s /// sub) ++ sub
             where sub = mgu $ map (\(e1, e2) -> (e1 // s, e2 // s)) eqs
-            
+
 makeFreshVars :: Name -> Pat -> [Expr]
 makeFreshVars n (Pat _ vs) = [Var (show i ++ [delim] ++ n) [] | i <- [1 .. length vs]]
 

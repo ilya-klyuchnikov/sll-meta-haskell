@@ -8,9 +8,8 @@ import Data.List
 
 printTree t = unlines $ take 90 $ pprintTree "" "" t
 
-pprintTree :: String -> String -> Graph Conf -> [String]
+pprintTree :: String -> String -> Tree Expr -> [String]
 pprintTree indent msg (Node expr next) = make next where
-    make (EFold _ ren) = (indent ++ msg) : [indent ++ "|__" ++  (show expr) ++ "__|" ++ (show ren)]
     make (ETransient _ t) = (indent ++ msg) : (indent ++ "|__" ++ show expr) : (pprintTree (indent ++ " ") "|" t)
     make (EDecompose comp ts) = (indent ++ msg) :  (indent ++ "|__" ++ show expr): (concat (map (pprintTree (indent ++ " ") "|") ts))
     make (EVariants cs) = 

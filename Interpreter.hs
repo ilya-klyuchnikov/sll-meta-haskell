@@ -16,7 +16,7 @@ exprMachine p = step where
     step (Ctr name []) =
         Stop (Ctr name [])
     step (Ctr name args) = 
-        Decompose (Ctr name) args
+        Decompose name args
     step (FCall name args) | (FDef _ vs body) <- fDef p name= 
         Transient Nothing (body // zip vs args)
     step (GCall g ((Ctr c cargs) : args)) | (GDef _ pat@(Pat _ cvs) vs body) <- gDef p g c =
@@ -38,4 +38,4 @@ eval p = intExprTree . buildEvaluationTree (exprMachine p)
 intExprTree :: Tree Expr -> Expr
 intExprTree (Leaf e) = e
 intExprTree (Node _ (ETransient _ t)) = intExprTree t
-intExprTree (Node _ (EDecompose comp ts)) = comp (map intExprTree ts)
+intExprTree (Node _ (EDecompose name ts)) = Ctr name (map intExprTree ts)

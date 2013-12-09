@@ -19,10 +19,8 @@ type Binding a = (Name, a)
 type Subst a = [Binding a]
 type NameSupply = [Name]
 
-type Conf = Expr
-type Value = Expr
-type Task = (Conf, Program)
-type Env = [(Name, Value)]
+type Task = (Expr, Program)
+type Env = [(Name, Expr)]
 
 -- TestResult is used for construction of evaluation trace
 data TestResult = CtrMatch Pat
@@ -31,15 +29,12 @@ data TestResult = CtrMatch Pat
 data Step a = Transient (Maybe TestResult) a 
             | Variants [(Subst a, a)]
             | Stop a 
-            | Decompose ([a] -> a) [a]
+            | Decompose Name [a]
 
-data Edge a = ETransient (Maybe TestResult) (Graph a) 
-            | EVariants [(Subst a, Graph a)] 
-            | EDecompose ([a] -> a) [Graph a] 
-            | EFold (Graph a) Renaming
+data Edge a = ETransient (Maybe TestResult) (Tree a) 
+            | EVariants [(Subst a, Tree a)] 
+            | EDecompose Name [Tree a]
 
-data Graph a = Node a (Edge a) | Leaf a
-type Tree a = Graph a
-type Node a = Tree a
+data Tree a = Node a (Edge a) | Leaf a
 
 type Machine a = a -> Step a
