@@ -4,6 +4,7 @@ module Data where
 
 -- SLL, Simple Lazy Language
 type Name = String
+-- Var possibly contains restrictions (a list of atoms)
 data Expr = Var Name [Expr]
           | Atom Char
           | Ctr Name [Expr]
