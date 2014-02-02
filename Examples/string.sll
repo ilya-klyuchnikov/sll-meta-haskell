@@ -1,0 +1,34 @@
+{- Is `p` a substring of `s`? -}
+fMatch(p, s) = gM(p, s, p, s);
+
+gM(Nil(), ss, op, os) = 'T';
+gM(Cons(p, pp), ss, op, os) = gX(ss, p, pp, op, os);
+
+gX(Nil(), p, pp,  op, os) = 'F';
+gX(Cons(s, ss), p, pp,  op, os) = if s=p
+                                     then gM(pp, ss, op, os)
+                                     else gN(os, op);
+
+gN(Nil(), op) = False();
+gN(Cons(s, ss), op) = gM(op, ss, op, ss);
+
+{- Are `x` and `y` equal? -}
+fEq(x, y) = if x=y then 'T' else 'F';
+
+{- replaces all 'a to 'b -}
+ga2b(Nil()) = Nil();
+ga2b(Cons(x, xs)) = if x='A'
+                       then Cons('B', ga2b(xs))
+                       else Cons(x, ga2b(xs));
+
+{- gStrEq(s1, s2) -- string equality -}
+gStrEq(Cons(a1, s1), s2) = gStrEq1(s2, a1, s1);
+gStrEq(Nil(), s2) = gStrEq2(s2);
+
+gStrEq1(Cons(a2, s2), a1, s1) = if a1=a2
+                                   then gStrEq(s1, s2)
+                                   else 'F';
+gStrEq1(Nil(), a1, s1) = 'F';
+
+gStrEq2(Nil()) = 'T';
+gStrEq2(Cons(x, xs)) = 'F';

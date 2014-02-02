@@ -22,14 +22,16 @@ data Program = Program [FDef] [GDef] deriving (Eq)
 type Renaming = [(Name, Name)]
 type Binding a = (Name, a)
 type Subst a = [Binding a]
-type NameSupply = [Name]
 
 type Task = (Expr, Program)
 type Env = [(Name, Expr)]
 
+-- TODO: it is better to make
+-- data Step a = Unfold a | Ctr Match Pat a | TestRes Bool a | ...
+-- to reduce a number of concepts
+
 -- TestResult is used for construction of evaluation trace
-data TestResult = CtrMatch Pat
-                | TestRes Bool
+data TestResult = CtrMatch Pat | TestRes Bool
 
 -- Evaluation step
 data Step a = Transient (Maybe TestResult) a

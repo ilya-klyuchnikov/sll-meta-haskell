@@ -1,0 +1,22 @@
+gContains(Nil(), y) = F();
+gContains(Cons(x, xs), y) = if x=y then T() else gContains(xs, ys);
+
+{- tree size -}
+fSize(xs) = gSize1(xs, Z());
+
+{- helper function in flat form -}
+gSize1(Nil(), acc)       = acc;
+gSize1(Cons(x, xs), acc) = gSize1(xs, S(acc));
+
+{- helper function in flat form -}
+gT(Z(), acc)  = acc;
+gT(S(n), acc) = gT(n, F());
+
+gEqNat(Z(), m)  = gEqZ(m);
+gEqNat(S(n), m) = gEqS(m, n);
+gEqZ(Z())  = T();
+gEqZ(S(n)) = F();
+gEqS(Z(), n)  = F();
+gEqS(S(m), n) = gEqNat(n, m);
+gAnd(F(), b) = F();
+gAnd(T(), b) = b;

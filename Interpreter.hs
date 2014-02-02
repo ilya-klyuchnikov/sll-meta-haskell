@@ -6,7 +6,7 @@ buildEvaluationTree :: Machine Expr -> Expr -> Tree Expr
 buildEvaluationTree m c = case m c of
     Stop e -> Leaf e
     Transient test e -> Node c (ETransient test (buildEvaluationTree m e))
-    Decompose comp ds -> Node c (EDecompose comp (map (buildEvaluationTree m) ds))
+    Decompose name ds -> Node c (EDecompose name (map (buildEvaluationTree m) ds))
 
 exprMachine :: Program -> Machine Expr
 exprMachine p = step where
@@ -15,13 +15,13 @@ exprMachine p = step where
         Stop (Atom n)
     step (Ctr name []) =
         Stop (Ctr name [])
-    step (Ctr name args) = 
+    step (Ctr name args) =
         Decompose name args
-    step (FCall name args) | (FDef _ vs body) <- fDef p name= 
+    step (FCall name args) | (FDef _ vs body) <- fDef p name=
         Transient Nothing (body // zip vs args)
     step (GCall g ((Ctr c cargs) : args)) | (GDef _ pat@(Pat _ cvs) vs body) <- gDef p g c =
         Transient (Just (CtrMatch pat)) (body // zip (cvs ++ vs) (cargs ++ args))
-    step (GCall gname (arg:args)) | Transient cond arg' <- step arg = 
+    step (GCall gname (arg:args)) | Transient cond arg' <- step arg =
         Transient cond (GCall gname (arg':args))
     step (TestEq (e1, e2) branches) | reducible e1, Transient cond e1' <- step e1 =
         Transient cond (TestEq (e1', e2) branches)

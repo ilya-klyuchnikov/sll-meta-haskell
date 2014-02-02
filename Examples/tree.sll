@@ -1,0 +1,30 @@
+{- list concatenation -}
+gAppend(Nil(), ys) = ys;
+gAppend(Cons(x, xs), ys) = Cons(x, gAppend(xs, ys));
+
+{- tree flattening -}
+gFlatten(Leaf(a)) = Cons(a, Nil());
+gFlatten(Node(lt, s, rt)) = gAppend(gFlatten(lt), Cons(s, gFlatten(rt)));
+
+gAdd(Z(), y) = y;
+gAdd(S(x), y) = S(gAdd(x, y));
+
+{- nat equality -}
+gEq(Z(), y) = gEqZ(y);
+gEq(S(x), y) = gEqS(y, x);
+gEqZ(Z()) = 'T';
+gEqZ(S(x)) = 'F';
+gEqS(Z(), x) = 'F';
+gEqS(S(y), x) = gEq(x, y);
+
+{- tree size -}
+gSize(Leaf(a)) = S(Z());
+gSize(Node(lTree, s, rTree)) = S(gAdd(gSize(lTree), gSize(rTree)));
+
+{- list equality -}
+gListEq(Cons(x, xs), ys) = gListEq1(ys, x, xs);
+gListEq(Nil(), ys) = gListEq2(ys);
+gListEq1(Cons(y, ys), x, xs) = if x=y then gListEq(xs, ys) else 'F';
+gListEq1(Nil(), x, xs) = 'F';
+gListEq2(Nil()) = 'T';
+gListEq2(Cons(y, ys)) = 'F';

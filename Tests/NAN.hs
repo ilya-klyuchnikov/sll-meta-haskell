@@ -108,7 +108,6 @@ answer7 = "[(\"x\",'A'),(\"y\",y<!='A'>)]"
 
 testNAN7 = testNAN "testNAN7" prog7 in7 center7 answer7
 
+nanTests = TestList [ testNAN1, testNAN2, testNAN3, testNAN4, testNAN5, testNAN6, testNAN7 ]
 
-tests = TestList [ testNAN1, testNAN2, testNAN3, testNAN4, testNAN5, testNAN6, testNAN7 ]
-
-main = runTestTT tests
+main = runTestTT nanTests

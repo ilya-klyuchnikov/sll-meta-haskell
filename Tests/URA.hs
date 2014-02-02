@@ -92,6 +92,6 @@ answer4 = "[[(\"t\",Leaf(1.t))]]"
 testURA4 = testURA "testURA4" prog4 in4 out4 answer4
 ------------------------------------------------------
 
-tests = TestList [ testURA1, testURA2, testURA3, testURA4 ]
+uraTests = TestList [ testURA1, testURA2, testURA3, testURA4 ]
 
-main = runTestTT tests
+main = runTestTT uraTests
