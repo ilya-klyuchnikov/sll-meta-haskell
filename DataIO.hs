@@ -6,17 +6,14 @@ import Data.Maybe
 import Data.Char
 import Data.List
 
-printTree t = unlines $ take 90 $ pprintTree "" "" t
+-- pretty printing of expressions and programs,
+-- parsing of expressions and programs
+-- pretty printing of trees
 
-pprintTree :: String -> String -> Tree Expr -> [String]
-pprintTree indent msg (Node expr next) = make next where
-    make (ETransient _ t) = (indent ++ msg) : (indent ++ "|__" ++ show expr) : (pprintTree (indent ++ " ") "|" t)
-    make (EDecompose comp ts) = (indent ++ msg) :  (indent ++ "|__" ++ show expr): (concat (map (pprintTree (indent ++ " ") "|") ts))
-    make (EVariants cs) = 
-        (indent ++ msg) :  (indent ++ "|__" ++  show expr) : (concat (map (\(x, t) -> pprintTree (indent ++ " ") ("?" ++ show x) t) cs))
-pprintTree indent msg (Leaf expr) = (indent ++ msg) : [indent ++ "|__" ++  (show expr)]
-    
+withDelim :: [a] -> [[a]] -> [a]
+withDelim xs xss = concat (intersperse xs xss)
 
+-- SLL pretty printing
 instance Show Expr where
     show (Var n []) = n
     show (Var n rs) = n ++ "<" ++ (withDelim ", " (map (("!=" ++). show) rs)) ++ ">"
@@ -26,7 +23,7 @@ instance Show Expr where
     show (Atom a) = show a
     show (TestEq (a1, a2) (e1, e2)) = "if(" ++ (show a1) ++ " == " ++ (show a2) ++", " ++ (show e1) ++ ", " ++ (show e2) ++ ")"
 
-fn :: String -> String  
+fn :: String -> String
 fn (_:s:ss) = (toLower s) : ss
 
 instance Show FDef where
@@ -40,15 +37,6 @@ instance Show Pat where
 
 instance Show Program where
     show (Program fs gs) = withDelim "\n" $ (map show fs) ++ (map show gs)
-    
-instance Show a => Show (Step a) where
-    show (Transient _ a) = "=> " ++ (show a)
-    show (Variants vs) = withDelim "\n" $ map (\(c, e) -> (show c) ++ " => " ++ (show e)) vs 
-    show (Stop _) = "!"
-    show (Decompose _ ds) = "DEC " ++ (show ds)
-
-withDelim :: [a] -> [[a]] -> [a]
-withDelim xs xss = concat (intersperse xs xss)
 
 -- SLL parsing
 instance Read Expr where
@@ -61,8 +49,7 @@ readArgs :: ReadS [Expr]
 readArgs s0 = [(args, s2)] where
     [("(", s1)] = lex s0
     [(args, s2)] = readArgs' s1
-    
--- TODO: generalize readArgs and readVar
+
 readArgs' :: ReadS [Expr]
 readArgs' s = case lex s of
     [(")", s1)] -> [([], s1)]
@@ -89,7 +76,7 @@ readVars' s = case lex s of
         [(args, s3)] = readVars' s2
 
 readExpr :: ReadS Expr
-readExpr s = case lex s of 
+readExpr s = case lex s of
     [("if", s1)] -> [(TestEq (a1, a2) (e1, e2), s8)] where
         [(a1,     s2)] = readExpr s1
         [("=",    s3)] = lex s2
@@ -120,7 +107,7 @@ readFDef i = do
     ("=", s2) <- lex s1
     (body, s3) <- readExpr s2
     (";", s4) <- lex s3
-    return (FDef n vars body, s4) 
+    return (FDef n vars body, s4)
 
 readGDef :: ReadS GDef
 readGDef i = do
@@ -150,3 +137,21 @@ readProgram' p@(Program fs gs) s = oneOf (readComment s) (readFDef s) (readGDef 
     oneOf _ [(f, s1)] _ = readProgram' (Program (fs++[f]) gs) s1
     oneOf _ _ [(g, s1)] = readProgram' (Program fs (gs++[g])) s1
     oneOf _ _ _ = (p, s)
+
+-- pretty printing of steps
+instance Show a => Show (Step a) where
+    show (Transient _ a) = "=> " ++ (show a)
+    show (Variants vs) = withDelim "\n" $ map (\(c, e) -> (show c) ++ " => " ++ (show e)) vs
+    show (Stop _) = "!"
+    show (Decompose _ ds) = "DEC " ++ (show ds)
+
+-- pretty printing of trees
+printTree t = unlines $ take 90 $ pprintTree "" "" t
+
+pprintTree :: String -> String -> Tree Expr -> [String]
+pprintTree indent msg (Node expr next) = make next where
+    make (ETransient _ t) = (indent ++ msg) : (indent ++ "|__" ++ show expr) : (pprintTree (indent ++ " ") "|" t)
+    make (EDecompose comp ts) = (indent ++ msg) :  (indent ++ "|__" ++ show expr): (concat (map (pprintTree (indent ++ " ") "|") ts))
+    make (EVariants cs) =
+        (indent ++ msg) :  (indent ++ "|__" ++  show expr) : (concat (map (\(x, t) -> pprintTree (indent ++ " ") ("?" ++ show x) t) cs))
+pprintTree indent msg (Leaf expr) = (indent ++ msg) : [indent ++ "|__" ++  (show expr)]
