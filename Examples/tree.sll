@@ -28,3 +28,5 @@ gListEq1(Cons(y, ys), x, xs) = if x=y then gListEq(xs, ys) else 'F';
 gListEq1(Nil(), x, xs) = 'F';
 gListEq2(Nil()) = 'T';
 gListEq2(Cons(y, ys)) = 'F';
+
+fExample() = gFlatten(Node(Leaf('a'), 'b', Leaf('c')));
