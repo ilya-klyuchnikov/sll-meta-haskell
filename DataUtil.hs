@@ -84,28 +84,26 @@ reducible (GCall _ _)  = True
 reducible (TestEq _ _) = True
 reducible _            = False
 
--- TODO: simplify by making new datatype
--- Left True - if expressions are definitely equal
--- Left False - if expressions are definitely not equal
--- Right (sub1, sub2)
---   (sub1 - substitution which results in equality)
---   (sub2 - substitution whuch results in non-equality)
-test :: (Expr, Expr) -> Either Bool (Subst Expr, Subst Expr)
+-- we use Unknown as a hack - to make it possible to make driving a true extension of evaluation
+data TestOut = DefEqual | DefNotEqual | CondEqual (Subst Expr, Subst Expr) | Unknown
+test :: (Expr, Expr) -> TestOut
 test (Var a1 rs1, Var a2 rs2)
-    | a1 == a2 = Left True
-    | (Var a2 []) `elem` rs1 = Left False
-    | otherwise = Right (s1, s2) where
+    | a1 == a2 = DefEqual
+    | (Var a2 []) `elem` rs1 = DefNotEqual
+    | otherwise = CondEqual (s1, s2) where
         s1 = [(a1, Var a2 rs2)]
         s2 = [(a1, Var a1 [var a2]), (a2, Var a2 [var a1])]
 test (Var v rs, a@(Atom _))
-    | a `elem` rs = Left False
-    | otherwise   = Right (s1, s2) where
+    | a `elem` rs = DefNotEqual
+    | otherwise   = CondEqual (s1, s2) where
         s1 = [(v, a)]
         s2 = [(v, Var v [a])]
 test (a@(Atom _), Var v rs)
-    | a `elem` rs = Left False
-    | otherwise   = Right (s1, s2) where
+    | a `elem` rs = DefNotEqual
+    | otherwise   = CondEqual (s1, s2) where
         s1 = [(v, a)]
         s2 = [(v, Var v [a])]
 test (a1@(Atom _), a2@(Atom _)) =
-    Left (a1 == a2)
+    if a1 == a2 then DefEqual else DefNotEqual
+test e =
+    Unknown

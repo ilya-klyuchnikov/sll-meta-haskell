@@ -23,7 +23,7 @@ confMachine p = step where
         Variants (map (\(c, e1') -> (c, (TestEq (e1', e2) bs))) cs)
     step (TestEq (e1, e2) bs) | reducible e2, Variants cs <- step e2 =
         Variants (map (\(c, e2') -> (c, (TestEq (e1, e2') bs))) cs)
-    step (TestEq cond (e1, e2)) | Right (s1, s2) <- test cond =
+    step (TestEq cond (e1, e2)) | CondEqual (s1, s2) <- test cond =
         Variants [(s1, e1 // s1), (s2, e2 // s2)]
     step e@(Var _ _) = Stop e
     step e = exprMachine p e

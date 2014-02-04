@@ -17,7 +17,7 @@ exprMachine p = step where
         Stop (Ctr name [])
     step (Ctr name args) =
         Decompose name args
-    step (FCall name args) | (FDef _ vs body) <- fDef p name=
+    step (FCall name args) | (FDef _ vs body) <- fDef p name =
         Transient Nothing (body // zip vs args)
     step (GCall g ((Ctr c cargs) : args)) | (GDef _ pat@(Pat _ cvs) vs body) <- gDef p g c =
         Transient (Just (CtrMatch pat)) (body // zip (cvs ++ vs) (cargs ++ args))
@@ -27,9 +27,9 @@ exprMachine p = step where
         Transient cond (TestEq (e1', e2) branches)
     step (TestEq (e1, e2) branches) | reducible e2, Transient cond e2' <- step e2 =
         Transient cond (TestEq (e1, e2') branches)
-    step (TestEq cond (e1, e2)) | Left True <- test cond =
+    step (TestEq cond (e1, e2)) | DefEqual <- test cond =
         Transient (Just (TestRes True)) e1
-    step (TestEq cond (e1, e2)) | Left False <- test cond =
+    step (TestEq cond (e1, e2)) | DefNotEqual <- test cond =
         Transient (Just (TestRes False)) e2
 
 eval :: Program -> Expr -> Expr
