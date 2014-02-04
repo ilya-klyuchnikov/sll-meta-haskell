@@ -1,7 +1,7 @@
-module Examples.InterpreterSmallStepCBN2 where
+module Examples.InterpreterMixedCBN2 where
 
 import Examples.Examples
-import Interpreters.SmallStepCBN2
+import Interpreters.MixedCBN2
 import DataIO
 
 example01 = int progList (read "gContains(Nil(), 'A')")
@@ -10,6 +10,7 @@ example03 = int progList (read "gContains(Cons('B', Cons('A', Nil())), 'A')")
 
 example04 = int progTest (read "fFirstArg('a', fInf())")
 example05 = int progTest (read "fFirstArg('a', fLoop())")
+
 example06 = int progTest (read "fExample06()")
 
 tree01 = buildTree progList (read "gContains(Nil(), 'A')")
