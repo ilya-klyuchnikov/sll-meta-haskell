@@ -5,6 +5,7 @@ import DataUtil
 import Data.Maybe
 import Data.Char
 import Data.List
+import GenVar
 
 -- pretty printing of expressions and programs,
 -- parsing of expressions and programs
@@ -15,8 +16,8 @@ withDelim xs xss = concat (intersperse xs xss)
 
 -- SLL pretty printing
 instance Show Expr where
-    show (Var n []) = n
-    show (Var n rs) = n ++ "<" ++ (withDelim ", " (map (("!=" ++). show) rs)) ++ ">"
+    show (Var n []) = prettyName n
+    show (Var n rs) = (prettyName n) ++ "<" ++ (withDelim ", " (map (("!=" ++). show) rs)) ++ ">"
     show (Ctr n es) = n ++ "(" ++ (withDelim ", " (map show es)) ++ ")"
     show (FCall n es) = (fn n) ++ "(" ++ (withDelim ", " (map show es)) ++ ")"
     show (GCall n es) = (fn n) ++ "(" ++ (withDelim ", " (map show es)) ++ ")"
@@ -153,5 +154,11 @@ pprintTree indent msg (Node expr next) = make next where
     make (ETransient _ t) = (indent ++ msg) : (indent ++ "|__" ++ show expr) : (pprintTree (indent ++ " ") "|" t)
     make (EDecompose comp ts) = (indent ++ msg) :  (indent ++ "|__" ++ show expr): (concat (map (pprintTree (indent ++ " ") "|") ts))
     make (EVariants cs) =
-        (indent ++ msg) :  (indent ++ "|__" ++  show expr) : (concat (map (\(x, t) -> pprintTree (indent ++ " ") ("?" ++ show x) t) cs))
+        (indent ++ msg) :  (indent ++ "|__" ++  show expr) :
+            --(concat (map (\([(v, ptr)], t) -> pprintTree (indent ++ " ") ("?" ++ (prettyName v) ++ " -> " ++ (show ptr)) t) cs))
+            (concat (map (\(x, t) -> pprintTree (indent ++ " ") ("?" ++ (prettySub x)) t) cs))
 pprintTree indent msg (Leaf expr) = (indent ++ msg) : [indent ++ "|__" ++  (show expr)]
+
+prettySub [] = ""
+prettySub ((x, ptr):[]) = (prettyName x) ++ " -> " ++ (show ptr)
+prettySub ((x, ptr):bs) = (prettyName x) ++ " -> " ++ (show ptr) ++ ", " ++ (prettySub bs)

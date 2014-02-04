@@ -1,4 +1,4 @@
-module GenVar (genVars, prettyVar) where
+module GenVar (genVars, prettyVar, prettyName) where
 
 import Data
 import Data.List

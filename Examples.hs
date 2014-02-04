@@ -27,7 +27,7 @@ sampleURA comment prog inputConfText resultText = do
     putStrLn ("\n===================\n"++ comment ++ "\nURA task:")
     putStrLn ("\t" ++ (show input) ++ " -> " ++ (show output))
     putStrLn "answer:"
-    putStrLn $ withDelim "\n" $ map (("\t" ++) . show) $ map prettySub $ take 10 result
+    putStrLn $ withDelim "\n" $ map (("\t" ++)) $ map prettySub $ take 10 result
     putStrLn note
     putStrLn note1
     where
@@ -48,8 +48,6 @@ sampleNan comment prog conf center = do
         inputConf = (read conf) :: Expr
         inputData = (read center) :: Expr
         result = nan (perfectDriveMachine prog) inputConf inputData
-
-prettySub = map (\(x, y) -> (x, prettyVar y))
 
 sampleURA01 = sampleURA
         "sampleURA01 - which string IS a substring of `AB`?"
