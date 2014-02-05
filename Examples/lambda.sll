@@ -1,0 +1,64 @@
+{- implementation of type-checker for Simly Typed Lambda Calculus -}
+{- data Expr = Var(name, type) | Lam(Var(name, type), Expr) | App(Expr, Expr) -}
+{- Type = Base(Char) | Arrow(Type, Type) -}
+{- TypeCheckResult = OK Type | ERR -}
+
+gTypeCheck(Var(n, tp)) = OK(tp);
+gTypeCheck(Lam(v, body)) = gTypeCheckLam(gTypeCheck(body), gGetVarType(v));
+gTypeCheck(App(e1, e2)) = gTypeCheckApp1(gTypeCheck(e1), gTypeCheck(e2));
+
+gGetVarType(Var(n, tp)) = tp;
+
+gTypeCheckLam(ERR(), varType) = ERR();
+gTypeCheckLam(OK(bodyType), varType) = OK(Arrow(varType, bodyType));
+
+gTypeCheckApp1(ERR(), e2type) = ERR();
+gTypeCheckApp1(OK(e1type), e2type) = gTypeCheckApp2(e1type, e2type);
+
+{-
+gTypeCheckApp2(ERR(), e1type) = ERR();
+gTypeCheckApp2(OK(e2type), e1type) = gTypeCheckApp3(e1type, e2type);
+
+gTypeCheckApp3(Base(x), e2type) = ERR();
+gTypeCheckApp3(Arrow(tpFrom, tpTo), e2type) = if gEqualType(tpFrom, e2type)='T'
+											 then OK(tpTo)
+											 else ERR();-}
+
+gTypeCheckApp2(Base(x), e2type) = ERR();
+gTypeCheckApp2(Arrow(e1From, e1To), e2type) = gTypeCheckApp3(e2type, e1From, e1To);
+
+gTypeCheckApp3(ERR(), e1From, e1To) = ERR();
+gTypeCheckApp3(OK(argType), e1From, e1To) = if gEqualType(e1From, argType)='T'
+											  then OK(e1To)
+											  else ERR();
+
+
+gEqualType(Base(v), tp) = gEqualBase(tp, v);
+gEqualType(Arrow(tp1From, tp1To), tp2) = gEqualArrow(tp2, tp1From, tp1To);
+
+gEqualArrow(Base(v), tp1To, tp1To) = 'F';
+gEqualArrow(Arrow(tp2From, tp2To), tp1From, tp2To) = fAnd(gEqualType(tp2From, tp1From), gEqualType(tp2To, tp1To));
+
+fAnd(b1, b2) = if b1='T' then b2 else 'F';
+
+gEqualBase(Base(v1), v2) = if v1=v2 then 'T' else 'F';
+gEqualBase(Arrow(tp1, tp2)) = 'F';
+
+fExp01() = Var('x', Base('A'));
+fExp02() = Var('x', Arrow(Base('A'), Base('A')));
+fExp03() = App(Var('x', Base('A')), Var('y', Base('A')));
+fExp04() = App(Var('x', Arrow(Base('A'), Base('A'))), Var('y', Base('A')));
+fExp05() = App(Var('x', Arrow(Base('A'), Base('B'))), Var('y', Base('A')));
+fExp06() = Lam(Var('x', Base('A')), Var('y', Base('B')) );
+
+fExample01() = gTypeCheck(fExp01());
+fExample02() = gTypeCheck(fExp02());
+fExample03() = gTypeCheck(fExp03());
+fExample04() = gTypeCheck(fExp04());
+fExample05() = gTypeCheck(fExp05());
+fExample06() = gTypeCheck(fExp06());
+
+gIsOK(OK(e)) = 'T';
+gIsOK(ERR()) = 'F';
+
+fIsTyped(e) = gIsOK(gTypeCheck(e));
