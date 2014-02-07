@@ -1,4 +1,4 @@
-module Tests.NAN where
+module Tests.NAN (nanTests) where
 
 import Data
 import DataUtil
@@ -10,14 +10,10 @@ import Examples
 
 import Test.HUnit
 
-unescape :: String -> String
-unescape ('|' : s) = '"' : unescape s
-unescape (c   : s) = c   : unescape s
-unescape []        = []
+-- regression tests for NAN
 
 -- really smoke testing, since we test external representation (via show)
--- TODO : stronger testing. It requires: reading classes with inequalities,
--- + comparing classes up to variable renaming
+-- TODO : comparing classes up to variable renaming
 testNAN name prog input center answer = TestCase $ assertEqual
 	name
 	answer
@@ -56,7 +52,7 @@ center3 = read "fMatch(Cons('A', Nil()), Cons('A', Cons('A', Nil())))"
 
 prog3 = progString
 
-answer3 = "[(\"x\",Cons(1.x, Nil())),(\"y\",Cons(1.x, 2.y))]"
+answer3 = "[(\"x\",Cons(x.1, Nil())),(\"y\",Cons(x.1, y.2))]"
 
 testNAN3 = testNAN "testNAN3" prog3 in3 center3 answer3
 ------------------------------------------------------
@@ -68,7 +64,7 @@ center4 = read "fMatch(Cons('A', Nil()), Cons('B', Cons('A', Nil())))"
 
 prog4 = progString
 
-answer4 = "[(\"x\",Cons(1.x<!=1.y>, Nil())),(\"y\",Cons(1.y<!=1.x>, Cons(1.x<!=1.y>, 2.2.y)))]"
+answer4 = "[(\"x\",Cons(x.1<!=y.1>, Nil())),(\"y\",Cons(y.1<!=x.1>, Cons(x.1<!=y.1>, y.6)))]"
 
 testNAN4 = testNAN "testNAN4" prog4 in4 center4 answer4
 ------------------------------------------------------
@@ -80,7 +76,7 @@ center5 = read "P(gStrEq(Cons('A', Nil()), Cons('B', Nil())))"
 
 prog5 = progString
 
-answer5 = "[(\"x\",Cons(1.x<!='B'>, 2.x))]"
+answer5 = "[(\"x\",Cons(x.1<!='B'>, x.2))]"
 
 testNAN5 = testNAN "testNAN5" prog5 in5 center5 answer5
 ------------------------------------------------------
@@ -92,7 +88,7 @@ center6 = read "P(gStrEq(Cons('A', Nil()), Cons('B', Nil())), gStrEq(Cons('A', N
 
 prog6 = progString
 
-answer6 = "[(\"x\",Cons(1.x<!='B', !='C'>, 2.x))]"
+answer6 = "[(\"x\",Cons(x.1<!='B', !='C'>, x.2))]"
 
 testNAN6 = testNAN "testNAN6" prog6 in6 center6 answer6
 ------------------------------------------------------

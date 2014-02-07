@@ -1,4 +1,4 @@
-module Tests.URA where
+module Tests.URA (uraTests) where
 
 import Data
 import DataUtil
@@ -9,11 +9,6 @@ import URA
 import Examples
 
 import Test.HUnit
-
-unescape :: String -> String
-unescape ('|' : s) = '"' : unescape s
-unescape (c   : s) = c   : unescape s
-unescape []        = []
 
 -- really smoke testing, since we test external representation (via show)
 -- TODO : stronger testing. It requires: reading classes with inequalities,
@@ -53,10 +48,10 @@ out2 = read "'F'"
 prog2 = progString
 
 answer2 = "[\
-\[(\"x\",Cons('A', Cons('B', Cons(1.2.2.x, 2.2.2.x))))],\
-\[(\"x\",Cons('B', Cons(1.2.x, 2.2.x)))],\
-\[(\"x\",Cons(1.x<!='A', !='B'>, 2.x))],\
-\[(\"x\",Cons('A', Cons(1.2.x<!='B'>, 2.2.x)))]\
+\[(\"x\",Cons('A', Cons('B', Cons(x.11, x.12))))],\
+\[(\"x\",Cons('B', Cons(x.5, x.6)))],\
+\[(\"x\",Cons(x.1<!='A', !='B'>, x.2))],\
+\[(\"x\",Cons('A', Cons(x.5<!='B'>, x.6)))]\
 \]"
 
 testURA2 = testURA "testURA2" prog2 in2 out2 answer2
@@ -87,7 +82,7 @@ out4 = read "'T'"
 
 prog4 = progTree
 
-answer4 = "[[(\"t\",Leaf(1.t))]]"
+answer4 = "[[(\"t\",Leaf(t.1))]]"
 
 testURA4 = testURA "testURA4" prog4 in4 out4 answer4
 ------------------------------------------------------
