@@ -1,4 +1,4 @@
-module Examples.InterpreterSmallStepCBN where
+module Examples.InterpreterSmallStepCBV where
 
 import Examples.Examples
 import Interpreters.SmallStepCBV
