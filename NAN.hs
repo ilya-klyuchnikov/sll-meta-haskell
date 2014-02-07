@@ -1,4 +1,4 @@
-module NeighborhoodAnalysis (nan) where
+module NAN (nan) where
 
 import Data
 import DataUtil

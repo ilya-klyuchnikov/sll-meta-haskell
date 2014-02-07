@@ -7,7 +7,7 @@ import DataUtil
 import DataIO
 import Driving
 import GenVar
-import NeighborhoodAnalysis
+import NAN
 import URA
 import Interpreter
 

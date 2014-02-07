@@ -5,7 +5,7 @@ import DataUtil
 import DataIO
 import Driving
 
-import NeighborhoodAnalysis
+import NAN
 import Examples
 
 import Test.HUnit
