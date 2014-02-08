@@ -4,6 +4,8 @@ import Data
 import DataUtil
 import DataIO
 
+-- small-step interpreter for call-by-name semantics
+
 int :: Program -> Expr -> Expr
 int p e = until isValue (intStep p) e
 

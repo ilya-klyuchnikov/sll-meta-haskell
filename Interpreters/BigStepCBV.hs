@@ -5,6 +5,9 @@ import Data
 import DataUtil
 import DataIO
 
+-- big-step interpreter for call-by-value semantics
+-- implementation forces args to be evaluated first
+
 int :: Program -> Expr -> Expr
 
 int p e = int' p (forceArgs p e)

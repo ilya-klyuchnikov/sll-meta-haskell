@@ -1,7 +1,9 @@
-module Interpreters.MixedCBN2 where
+module Machines.MixedStepCBN where
 
 import Data
 import DataUtil
+
+-- *staged* mixed-step interpreter for call-by-name semantics
 
 buildTree :: Program -> Expr -> Tree Expr
 buildTree p e = buildEvaluationTree (exprMachine p) e

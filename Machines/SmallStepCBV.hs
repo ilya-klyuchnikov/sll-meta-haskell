@@ -1,7 +1,9 @@
-module Interpreters.SmallStepCBV2 where
+module Machines.SmallStepCBV where
 
 import Data
 import DataUtil
+
+-- *staged* small-step interpreter for call-by-value semantics
 
 buildTree :: Program -> Expr -> Tree Expr
 buildTree p e = buildEvaluationTree (exprMachine p) e

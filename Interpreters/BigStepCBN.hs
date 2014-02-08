@@ -4,6 +4,8 @@ import Data
 import DataUtil
 import DataIO
 
+-- big-step interpreter for call-by-name semantics
+
 int :: Program -> Expr -> Expr
 
 int p (Atom a) =
