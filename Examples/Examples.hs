@@ -10,7 +10,7 @@ loadProgram :: FilePath -> Program
 loadProgram path = read (unsafePerformIO (readFile path))
 
 progString = loadProgram "Examples/string.sll"
-progTree = loadProgram "Examples/tree.sll"
-progList = loadProgram "Examples/list.sll"
-progTest = loadProgram "Examples/test.sll"
+progTree   = loadProgram "Examples/tree.sll"
+progList   = loadProgram "Examples/list.sll"
 progLambda = loadProgram "Examples/lambda.sll"
+progTests  = loadProgram "Examples/tests.sll"
