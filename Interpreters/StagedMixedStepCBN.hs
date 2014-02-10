@@ -1,4 +1,4 @@
-module Machines.MixedStepCBN where
+module Interpreters.StagedMixedStepCBN (int) where
 
 import Data
 import DataUtil

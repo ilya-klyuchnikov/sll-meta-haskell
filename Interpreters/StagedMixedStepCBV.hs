@@ -1,4 +1,4 @@
-module Machines.SmallStepCBV where
+module Interpreters.StagedMixedStepCBV where
 
 import Data
 import DataUtil
@@ -17,11 +17,12 @@ buildEvaluationTree m c = case m c of
 exprMachine :: Program -> Machine Expr
 exprMachine p = step where
     step :: Machine Expr
-    step e | isValue e =
-        Stop e
-    step (Ctr name args) | Transient cond x' <- step x =
-        Transient cond (Ctr name (vals ++ (x' : xs))) where
-            (vals, x : xs) = span isValue args
+    step (Atom n) =
+        Stop (Atom n)
+    step (Ctr name []) =
+        Stop (Ctr name [])
+    step (Ctr name args) =
+        Decompose name args
     step (FCall name args) | and (map isValue args) =
         Transient Nothing (body // zip vs args) where
             (FDef _ vs body) = fDef p name

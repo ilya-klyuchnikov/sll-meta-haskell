@@ -1,9 +1,18 @@
-module Machines.SmallStepCBN where
+module Interpreters.StagedSmallStepCBN (int) where
 
 import Data
 import DataUtil
 
 -- *staged* small-step interpreter for call-by-name semantics
+
+-- eval a program
+int :: Program -> Expr -> Expr
+int p = intEvalTree . buildEvaluationTree (exprMachine p)
+
+-- eval an evaluation tree
+intEvalTree :: Tree Expr -> Expr
+intEvalTree (Leaf e) = e
+intEvalTree (Node _ (ETransient _ t)) = intEvalTree t
 
 buildTree :: Program -> Expr -> Tree Expr
 buildTree p e = buildEvaluationTree (exprMachine p) e
@@ -36,10 +45,3 @@ exprMachine p = step where
         Transient (Just (TestRes True)) e1
     step (TestEq cond (e1, e2)) | DefNotEqual <- test cond =
         Transient (Just (TestRes False)) e2
-
-int :: Program -> Expr -> Expr
-int p = intEvalTree . buildEvaluationTree (exprMachine p)
-
-intEvalTree :: Tree Expr -> Expr
-intEvalTree (Leaf e) = e
-intEvalTree (Node _ (ETransient _ t)) = intEvalTree t
