@@ -70,11 +70,15 @@ assertCallByValueIntError name program input =
 testCBV1 = assertCallByValueIntError "testCBV1" progTests "fFstArg(Z(), fError(Z()))"
 testCBV2 = assertCallByValueIntError "testCBV2" progTests "fSndArg(fError(Z()), Z())"
 
--- CNB doesn't touch arguments
+-- CBN doesn't touch arguments which are not needed for answer
 testCBN1 = assertCallByNameIntInputOutput "testCBN1" progTests "fFstArg(Z(), fError(Z()))" "Z()"
 testCBN2 = assertCallByNameIntInputOutput "testCBN2" progTests "fSndArg(fError(Z()), Z())" "Z()"
 
+-- CBN DOES touch arguments which are not needed for answer
+testCBN3 = assertCallByNameIntError "testCBN3" progTests "fSndArg(Z(), fError(Z()))"
+testCBN4 = assertCallByNameIntError "testCBN4" progTests "fFstArg(fError(Z()), Z())"
 
-intTests = TestList [testCBN1, testCBN2, testCBV1, testCBV2]
+
+intTests = TestList [testCBN1, testCBN2, testCBN3, testCBN4, testCBV1, testCBV2]
 
 main = runTestTT intTests
