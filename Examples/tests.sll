@@ -1,0 +1,5 @@
+fFstArg(x, y) = x;
+fSndArg(x, y) = y;
+
+{- infinite number -}
+fInf() = Succ(fInf());
